@@ -1,0 +1,43 @@
+// DET-001 | MFA Fatigue (Push Bombing) | v1.0.0
+// Tactic: Credential Access | Technique: T1621 (Multi-Factor Authentication Request Generation)
+//
+// Detects five or more denied/timed-out MFA challenges for one user within a
+// ten-minute window, then flags any MFA-approved success in the following 30
+// minutes - the point at which a fatigued user gives in.
+//
+// Notes
+// - Written for the production SigninLogs table. The lab's offline engine
+//   (src/detection_engine.py, detect_mfa_fatigue) implements the identical
+//   thresholds with a true sliding window; bin() below is the streaming-friendly
+//   approximation used in scheduled analytics rules.
+// - ResultType 500121 = authentication failed during strong-auth request.
+// Known false positives: users re-triggering prompts during device re-enrolment.
+let burst_window = 10m;
+let burst_threshold = 5;
+let followup = 30m;
+let denies =
+    SigninLogs
+    | where TimeGenerated > ago(1h)
+    | where ResultType == 500121
+    | project TimeGenerated, UserPrincipalName, IPAddress, AppDisplayName, CorrelationId;
+denies
+| summarize
+    DenyCount = count(),
+    FirstDeny = min(TimeGenerated),
+    LastDeny  = max(TimeGenerated),
+    SourceIPs = make_set(IPAddress, 10)
+    by UserPrincipalName, Window = bin(TimeGenerated, burst_window)
+| where DenyCount >= burst_threshold
+| join kind=leftouter (
+    SigninLogs
+    | where TimeGenerated > ago(1h)
+    | where ResultType == 0 and AuthenticationRequirement == "multiFactorAuthentication"
+    | project UserPrincipalName, ApprovedAt = TimeGenerated, ApprovedIP = IPAddress,
+              RiskLevelDuringSignIn
+) on UserPrincipalName
+| extend ApprovedAfterBurst = isnotempty(ApprovedAt)
+    and ApprovedAt between (LastDeny .. (LastDeny + followup))
+| extend Severity = iff(ApprovedAfterBurst, "Critical", "High")
+| project FirstDeny, LastDeny, UserPrincipalName, DenyCount, SourceIPs,
+          ApprovedAfterBurst, ApprovedAt, ApprovedIP, RiskLevelDuringSignIn, Severity
+| sort by FirstDeny asc

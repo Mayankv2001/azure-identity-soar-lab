@@ -1,0 +1,40 @@
+id: DET-001
+name: MFA Fatigue (Push Bombing)
+version: 1.0.0
+kind: Scheduled
+severity: High
+status: Enabled
+description: >-
+  Five or more denied or timed-out MFA challenges for a single user within a
+  rolling ten-minute window. Escalates to Critical when an MFA-approved sign-in
+  follows within 30 minutes, indicating the user finally accepted an
+  attacker-initiated prompt. Requires the attacker to already hold a valid
+  password, so every firing also implies a credential-compromise investigation.
+data_sources:
+  - SigninLogs
+tactics:
+  - CredentialAccess
+techniques:
+  - T1621
+query_file: ./DET-001-mfa-fatigue.kql
+query_frequency: PT15M
+query_period: PT1H
+trigger_operator: GreaterThan
+trigger_threshold: 0
+entity_mappings:
+  - entity_type: Account
+    field: UserPrincipalName
+  - entity_type: IP
+    field: SourceIPs
+local_detection: detect_mfa_fatigue
+tuning:
+  known_false_positives:
+    - Users repeatedly re-triggering prompts during device or authenticator re-enrolment.
+    - Helpdesk-driven MFA resets generating bursts of challenges.
+  exclusions: []
+sla:
+  ack_minutes: 30
+  resolve_hours: 8
+references:
+  - https://attack.mitre.org/techniques/T1621/
+  - https://learn.microsoft.com/en-us/azure/sentinel/detect-threats-custom

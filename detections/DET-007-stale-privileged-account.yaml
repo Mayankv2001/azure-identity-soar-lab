@@ -1,0 +1,39 @@
+id: DET-007
+name: Stale or Orphaned Privileged Account
+version: 1.0.0
+kind: Scheduled
+severity: Low
+status: Enabled
+description: >-
+  Posture detection for identity attack-surface reduction. Flags enabled
+  privileged accounts with no successful sign-in for 60 or more days (or no
+  recorded sign-in at all), and escalates orphaned privileged service accounts
+  that have no owner. These accounts are the quiet entry points attackers
+  favour: nobody notices when a dormant account wakes up. Directly informed by
+  identity governance and access-review experience in IAM/PAM operations.
+data_sources:
+  - Watchlist (PrivilegedIdentities)
+tactics:
+  - InitialAccess
+techniques:
+  - T1078
+query_file: ./DET-007-stale-privileged-account.kql
+query_frequency: P1D
+query_period: P1D
+trigger_operator: GreaterThan
+trigger_threshold: 0
+entity_mappings:
+  - entity_type: Account
+    field: Upn
+local_detection: detect_stale_privileged
+tuning:
+  known_false_positives:
+    - Intentionally dormant break-glass accounts (exclude by naming convention).
+    - Accounts authenticating through paths not captured in sign-in logs.
+  exclusions: []
+sla:
+  ack_minutes: 1440
+  resolve_hours: 168
+references:
+  - https://attack.mitre.org/techniques/T1078/
+  - https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview

@@ -1,0 +1,109 @@
+{
+  "description": "Logic App-style outlines for the six SOAR playbooks. Shaped like workflow definitions (trigger + actions with connector names) so each can be lifted into a real Logic App; kept as outlines because the lab is offline-first. Human-approval boundaries are explicit.",
+  "playbooks": [
+    {
+      "playbook_id": "PB-01",
+      "display_name": "pb-enrich-alert",
+      "purpose": "Add identity, asset and PAM context to every new incident so the analyst never starts cold.",
+      "trigger": {"type": "Microsoft Sentinel incident", "connector": "Microsoft Sentinel", "when": "incident created"},
+      "automation_level": "full-auto",
+      "approver_role": null,
+      "used_by_detections": ["DET-001", "DET-002", "DET-003", "DET-004", "DET-005", "DET-006", "DET-007"],
+      "actions": [
+        {"step": 1, "action": "Get_incident_entities", "connector": "Microsoft Sentinel", "operation": "Get entities (accounts, IPs)"},
+        {"step": 2, "action": "Lookup_identity_context", "connector": "HTTP", "operation": "GET identity inventory (department, title, is_privileged, roles, manager) - Graph API in production, data/identities.json in the lab"},
+        {"step": 3, "action": "Lookup_asset_context", "connector": "HTTP", "operation": "GET asset classification for any service principal entities (privilege tier, owner)"},
+        {"step": 4, "action": "Lookup_pam_context", "connector": "HTTP", "operation": "GET CyberArk recent checkout history for the account (REST API)"},
+        {"step": 5, "action": "Check_ip_reputation", "connector": "HTTP", "operation": "GET threat intelligence verdict for source IPs"},
+        {"step": 6, "action": "Update_incident", "connector": "Microsoft Sentinel", "operation": "Add enrichment as incident comment; apply tags (privileged-identity, vpn-egress, tier-0)"}
+      ],
+      "rollback": "Informational only - nothing to roll back."
+    },
+    {
+      "playbook_id": "PB-02",
+      "display_name": "pb-notify-oncall",
+      "purpose": "Put the right human on the incident inside the acknowledgement SLA.",
+      "trigger": {"type": "Microsoft Sentinel incident", "connector": "Microsoft Sentinel", "when": "incident created or severity raised to High/Critical"},
+      "automation_level": "full-auto",
+      "approver_role": null,
+      "used_by_detections": ["DET-001", "DET-002", "DET-003", "DET-004", "DET-005", "DET-006", "DET-007"],
+      "actions": [
+        {"step": 1, "action": "Compose_summary", "connector": "Data Operations", "operation": "Build card payload: incident id, title, severity, entities, top 3 triage steps, incident deep link"},
+        {"step": 2, "action": "Post_adaptive_card", "connector": "Microsoft Teams", "operation": "Post adaptive card to SOC channel"},
+        {"step": 3, "action": "Condition_severity_critical", "connector": "Control", "operation": "If severity == Critical"},
+        {"step": 4, "action": "Page_primary_dri", "connector": "HTTP", "operation": "POST to PagerDuty/Opsgenie events API (15-minute ack SLA)", "condition": "severity == Critical"},
+        {"step": 5, "action": "Schedule_escalation_check", "connector": "Control", "operation": "Delay 15 minutes, then escalate to secondary on-call if incident unacknowledged", "condition": "severity == Critical"}
+      ],
+      "rollback": "Informational only - mark notification as false alarm."
+    },
+    {
+      "playbook_id": "PB-03",
+      "display_name": "pb-open-ticket",
+      "purpose": "Guarantee every incident has an auditable work item with SLA timers.",
+      "trigger": {"type": "Microsoft Sentinel incident", "connector": "Microsoft Sentinel", "when": "incident created"},
+      "automation_level": "full-auto",
+      "approver_role": null,
+      "used_by_detections": ["DET-001", "DET-002", "DET-003", "DET-004", "DET-005", "DET-006", "DET-007"],
+      "actions": [
+        {"step": 1, "action": "Create_ticket", "connector": "HTTP (ServiceNow-style REST)", "operation": "POST incident record: short description, severity-mapped priority, assignment group SOC, link back to Sentinel"},
+        {"step": 2, "action": "Write_ticket_id_back", "connector": "Microsoft Sentinel", "operation": "Add ticket number as incident tag and comment"},
+        {"step": 3, "action": "Sync_on_close", "connector": "Microsoft Sentinel", "operation": "On incident close, resolve ticket with disposition (true positive / false positive / posture finding)"}
+      ],
+      "rollback": "Close the ticket with disposition 'opened in error'."
+    },
+    {
+      "playbook_id": "PB-04",
+      "display_name": "pb-revoke-sessions",
+      "purpose": "Cut attacker access fast by invalidating refresh tokens and active sessions - cheap to reverse, so it runs unattended at Critical severity.",
+      "trigger": {"type": "Microsoft Sentinel incident", "connector": "Microsoft Sentinel", "when": "identity-compromise incident (DET-001/002/003/005)"},
+      "automation_level": "full-auto for Critical severity, approval-required otherwise",
+      "approver_role": "SOC DRI",
+      "used_by_detections": ["DET-001", "DET-002", "DET-003", "DET-005"],
+      "actions": [
+        {"step": 1, "action": "Condition_check_severity", "connector": "Control", "operation": "If severity == Critical continue; else send approval card and wait"},
+        {"step": 2, "action": "Approval_gate", "connector": "Microsoft Teams", "operation": "Approval card to SOC DRI (skipped at Critical)", "human_approval": true},
+        {"step": 3, "action": "Revoke_sign_in_sessions", "connector": "Microsoft Entra ID", "operation": "Revoke sign-in sessions / invalidate refresh tokens for the account"},
+        {"step": 4, "action": "Flag_user_at_risk", "connector": "Microsoft Entra ID Protection", "operation": "Confirm user compromised (drives risk-based Conditional Access)"},
+        {"step": 5, "action": "Comment_incident", "connector": "Microsoft Sentinel", "operation": "Record action, actor (playbook), timestamp on the incident"}
+      ],
+      "rollback": "None needed - the legitimate user simply re-authenticates with MFA."
+    },
+    {
+      "playbook_id": "PB-05",
+      "display_name": "pb-require-password-reset",
+      "purpose": "Force credential rotation after confirmed credential compromise - always human-approved because resets on service accounts break integrations and mid-attack resets must pair with MFA re-registration.",
+      "trigger": {"type": "Microsoft Sentinel incident", "connector": "Microsoft Sentinel", "when": "analyst marks credential compromise confirmed"},
+      "automation_level": "approval-required",
+      "approver_role": "SOC DRI",
+      "used_by_detections": ["DET-001", "DET-002"],
+      "actions": [
+        {"step": 1, "action": "Check_service_account", "connector": "Control", "operation": "If target is a service account, stop and route to application owner instead", "human_approval": false},
+        {"step": 2, "action": "Approval_gate", "connector": "Microsoft Teams", "operation": "Approval card to SOC DRI with identity context", "human_approval": true},
+        {"step": 3, "action": "Force_password_reset", "connector": "Microsoft Entra ID", "operation": "Reset password, require change at next sign-in"},
+        {"step": 4, "action": "Require_mfa_reregistration", "connector": "Microsoft Entra ID", "operation": "Require re-register multifactor authentication (remove attacker-enrolled methods)"},
+        {"step": 5, "action": "Notify_user_and_manager", "connector": "Office 365 Outlook", "operation": "Out-of-band notification with helpdesk contact"},
+        {"step": 6, "action": "Comment_incident", "connector": "Microsoft Sentinel", "operation": "Record action and approval trail"}
+      ],
+      "rollback": "Helpdesk-assisted reset with in-person or video identity verification."
+    },
+    {
+      "playbook_id": "PB-06",
+      "display_name": "pb-disable-user",
+      "purpose": "Full account lockout for confirmed takeover - highest blast radius, so it always needs DRI approval and notifies the user's manager.",
+      "trigger": {"type": "Microsoft Sentinel incident", "connector": "Microsoft Sentinel", "when": "analyst marks account takeover confirmed"},
+      "automation_level": "approval-required",
+      "approver_role": "SOC DRI (user's manager notified)",
+      "used_by_detections": ["DET-001", "DET-003", "DET-004", "DET-005", "DET-006"],
+      "actions": [
+        {"step": 1, "action": "Gather_context", "connector": "Microsoft Sentinel", "operation": "Pull enrichment from PB-01: is the account privileged, a service account, or on-call staff?"},
+        {"step": 2, "action": "Approval_gate", "connector": "Microsoft Teams", "operation": "Approval card to SOC DRI including business-impact context", "human_approval": true},
+        {"step": 3, "action": "Disable_account", "connector": "Microsoft Entra ID", "operation": "Set accountEnabled = false"},
+        {"step": 4, "action": "Revoke_sessions", "connector": "Microsoft Entra ID", "operation": "Revoke all sessions and refresh tokens"},
+        {"step": 5, "action": "Suspend_pam_access", "connector": "HTTP", "operation": "Suspend the user's CyberArk safe access via REST API"},
+        {"step": 6, "action": "Notify_manager", "connector": "Office 365 Outlook", "operation": "Notify the user's manager and the service desk with reinstatement path"},
+        {"step": 7, "action": "Comment_incident", "connector": "Microsoft Sentinel", "operation": "Record action, approver, timestamp"}
+      ],
+      "rollback": "Re-enable the account after eviction is confirmed; user re-establishes sessions with fresh credentials and MFA."
+    }
+  ]
+}

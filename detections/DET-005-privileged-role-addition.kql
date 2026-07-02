@@ -1,0 +1,31 @@
+// DET-005 | Account Added to Privileged Role or Group | v1.0.0
+// Tactics: Privilege Escalation, Persistence
+// Techniques: T1098.003 (Additional Cloud Roles), T1098.007 (Additional Local or Domain Groups)
+//
+// Membership added to a protected directory role (Global Administrator,
+// Privileged Role Administrator) or a protected group (sg-prod-domain-admins).
+// In a PIM/JIT world, any direct standing assignment is suspicious; actor ==
+// target (self-elevation) is treated as a strong compromise signal and
+// escalates to Critical.
+//
+// Notes
+// - Written for the production AuditLogs table. The offline engine
+//   (detect_priv_role_addition) mirrors the logic against the sample schema.
+let protected_roles = dynamic(["Global Administrator", "Privileged Role Administrator"]);
+let protected_groups = dynamic(["sg-prod-domain-admins"]);
+AuditLogs
+| where TimeGenerated > ago(1d)
+| where OperationName in ("Add member to role", "Add member to group")
+| extend ActorUPN = tostring(InitiatedBy.user.userPrincipalName),
+         ActorIP  = tostring(InitiatedBy.user.ipAddress)
+| mv-expand tr = TargetResources
+| extend TargetUser = tostring(tr.userPrincipalName)
+| mv-expand mp = tr.modifiedProperties
+| where tostring(mp.displayName) in ("Role.DisplayName", "Group.DisplayName")
+| extend GrantedName = trim('"', tostring(mp.newValue))
+| where GrantedName in (protected_roles) or GrantedName in (protected_groups)
+| extend SelfElevation = ActorUPN =~ TargetUser
+| extend Severity = iff(SelfElevation, "Critical", "High")
+| project TimeGenerated, OperationName, ActorUPN, ActorIP, TargetUser,
+          GrantedName, SelfElevation, Severity
+| sort by TimeGenerated asc

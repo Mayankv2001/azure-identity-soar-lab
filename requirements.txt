@@ -1,0 +1,4 @@
+# Core pipeline (src/) is Python standard library only.
+# These packages are needed for the test suite and detection-as-code validation.
+pytest>=8.0
+PyYAML>=6.0

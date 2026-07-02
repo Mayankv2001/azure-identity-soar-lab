@@ -1,0 +1,5 @@
+[
+{"sp_id": "sp-9001", "display_name": "sp-automation-graph", "privilege_tier": "high", "owner_upn": "priya.sharma@contoso.com", "purpose": "Graph API automation - holds Directory.ReadWrite.All"},
+{"sp_id": "sp-9002", "display_name": "sp-billing-reader", "privilege_tier": "low", "owner_upn": "grace.kim@contoso.com", "purpose": "Read-only billing exports"},
+{"sp_id": "sp-9003", "display_name": "sp-devops-deploy", "privilege_tier": "medium", "owner_upn": "noah.patel@contoso.com", "purpose": "Azure DevOps deployment principal"}
+]

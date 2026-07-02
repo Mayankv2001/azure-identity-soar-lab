@@ -1,0 +1,28 @@
+// DET-003 | Conditional Access Policy Modified or Deleted | v1.0.0
+// Tactics: Defense Evasion, Persistence | Technique: T1556.009 (Modify Authentication Process: Conditional Access Policies)
+//
+// Every Conditional Access policy change is review-worthy: attackers weaken or
+// delete policies to remove MFA requirements after gaining an admin foothold.
+// The rule enriches each change with whether the actor holds a policy-management
+// role; unauthorised actors escalate the incident.
+//
+// Notes
+// - Written for the production AuditLogs table (InitiatedBy/TargetResources are
+//   dynamic). The lab's flattened sample schema exposes ActorUPN/TargetName
+//   directly - the offline engine (detect_ca_policy_change) mirrors the logic.
+// - The authorised-actor list is maintained as a Sentinel watchlist so that the
+//   SOC, not the rule author, owns membership.
+let authorised_actors =
+    _GetWatchlist('CAPolicyAdmins')
+    | project ActorUPN = tostring(SearchKey);
+AuditLogs
+| where TimeGenerated > ago(1d)
+| where OperationName in ("Update conditional access policy", "Delete conditional access policy")
+| extend ActorUPN = tostring(InitiatedBy.user.userPrincipalName),
+         ActorIP  = tostring(InitiatedBy.user.ipAddress)
+| extend PolicyName = tostring(TargetResources[0].displayName),
+         Changes    = tostring(TargetResources[0].modifiedProperties)
+| join kind=leftanti authorised_actors on ActorUPN
+| extend Severity = "Critical"   // unauthorised actor - authorised changes stay High via the base rule
+| project TimeGenerated, OperationName, ActorUPN, ActorIP, PolicyName, Changes, Severity
+| sort by TimeGenerated asc

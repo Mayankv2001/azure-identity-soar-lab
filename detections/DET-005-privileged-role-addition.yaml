@@ -1,0 +1,44 @@
+id: DET-005
+name: Account Added to Privileged Role or Group
+version: 1.0.0
+kind: Scheduled
+severity: High
+status: Enabled
+description: >-
+  Detects direct membership additions to protected Microsoft Entra ID roles
+  (Global Administrator, Privileged Role Administrator) or protected groups
+  (sg-prod-domain-admins). Where Privileged Identity Management is the standard,
+  any standing assignment deserves review; an actor granting the privilege to
+  their own account escalates to Critical because self-elevation almost always
+  indicates account takeover rather than administrative error.
+data_sources:
+  - AuditLogs
+tactics:
+  - PrivilegeEscalation
+  - Persistence
+techniques:
+  - T1098.003
+  - T1098.007
+query_file: ./DET-005-privileged-role-addition.kql
+query_frequency: PT15M
+query_period: P1D
+trigger_operator: GreaterThan
+trigger_threshold: 0
+entity_mappings:
+  - entity_type: Account
+    field: ActorUPN
+  - entity_type: Account
+    field: TargetUser
+local_detection: detect_priv_role_addition
+tuning:
+  known_false_positives:
+    - Break-glass procedures with retrospective approval.
+    - Migrations that temporarily assign standing roles (require change records).
+  exclusions: []
+sla:
+  ack_minutes: 30
+  resolve_hours: 8
+references:
+  - https://attack.mitre.org/techniques/T1098/003/
+  - https://attack.mitre.org/techniques/T1098/007/
+  - https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure

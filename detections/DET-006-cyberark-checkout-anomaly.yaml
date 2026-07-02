@@ -1,0 +1,40 @@
+id: DET-006
+name: Anomalous CyberArk Privileged Credential Checkout
+version: 1.0.0
+kind: Scheduled
+severity: Medium
+status: Enabled
+description: >-
+  Detects privileged credential checkouts from CyberArk that bypass normal
+  change hygiene - four or more ticketless checkouts by one user inside an
+  hour, or any ticketless checkout between 00:00 and 05:00 local time.
+  Checkouts against the Tier-0 domain-admins safe escalate. Built from
+  first-hand PAM operations experience: ticketless bulk checkout is how both
+  insiders and attackers with a compromised PAM session harvest credentials.
+data_sources:
+  - CyberArk_EPV_CL
+tactics:
+  - PrivilegeEscalation
+  - LateralMovement
+techniques:
+  - T1078.002
+query_file: ./DET-006-cyberark-checkout-anomaly.kql
+query_frequency: PT30M
+query_period: P1D
+trigger_operator: GreaterThan
+trigger_threshold: 0
+entity_mappings:
+  - entity_type: Account
+    field: Username
+local_detection: detect_cyberark_anomaly
+tuning:
+  known_false_positives:
+    - Genuine emergency changes where the ticket is raised retrospectively.
+    - Platform upgrades with pre-approved bulk credential rotation.
+  exclusions: []
+sla:
+  ack_minutes: 240
+  resolve_hours: 72
+references:
+  - https://attack.mitre.org/techniques/T1078/002/
+  - https://learn.microsoft.com/en-us/azure/sentinel/data-connectors-reference

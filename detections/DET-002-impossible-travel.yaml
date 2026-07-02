@@ -1,0 +1,47 @@
+id: DET-002
+name: Impossible Travel Sign-in
+version: 1.1.0
+kind: Scheduled
+severity: Medium
+status: Enabled
+description: >-
+  Consecutive successful sign-ins for the same user from locations that imply a
+  travel speed above 900 km/h. Version 1.1.0 adds an exclusion for pairs where
+  both IP addresses sit inside the corporate VPN egress range, after triage
+  confirmed that VPN nodes in different cities were the sole source of false
+  positives (see incident INC-1005 in the sample run). Severity escalates via
+  the shared model when the account is privileged, the sign-in is high-risk, or
+  the activity is outside business hours.
+data_sources:
+  - SigninLogs
+tactics:
+  - InitialAccess
+  - DefenseEvasion
+techniques:
+  - T1078.004
+query_file: ./DET-002-impossible-travel.kql
+query_frequency: PT30M
+query_period: P1D
+trigger_operator: GreaterThan
+trigger_threshold: 0
+entity_mappings:
+  - entity_type: Account
+    field: UserPrincipalName
+  - entity_type: IP
+    field: IPAddress
+local_detection: detect_impossible_travel
+tuning:
+  known_false_positives:
+    - Corporate VPN or SASE egress nodes located in different cities.
+    - Mobile carrier NAT ranges geolocating far from the user.
+  exclusions:
+    - field: IPAddress
+      op: both_endpoints_in_cidr
+      values:
+        - 198.51.100.0/24
+sla:
+  ack_minutes: 240
+  resolve_hours: 72
+references:
+  - https://attack.mitre.org/techniques/T1078/004/
+  - https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks

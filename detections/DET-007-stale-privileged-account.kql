@@ -1,0 +1,29 @@
+// DET-007 | Stale or Orphaned Privileged Account | v1.0.0
+// Tactic: Initial Access | Technique: T1078 (Valid Accounts)
+//
+// Posture detection rather than an in-the-moment attack signal: enabled
+// privileged accounts with no sign-in for 60+ days (or none ever) are standing
+// attack surface, and orphaned privileged service accounts (no owner) escalate
+// because nobody would notice their misuse.
+//
+// Notes
+// - Identity snapshots come from a Sentinel watchlist (exported nightly from
+//   Microsoft Entra ID via Logic App or Graph API in Mode B); in the lab the
+//   offline engine (detect_stale_privileged) reads data/identities.json.
+// - Watchlist values arrive as strings - hence the explicit conversions.
+let stale_days = 60d;
+_GetWatchlist('PrivilegedIdentities')
+| extend Upn            = tostring(column_ifexists('upn', '')),
+         IsPrivileged   = tobool(column_ifexists('is_privileged', false)),
+         Enabled        = tobool(column_ifexists('account_enabled', false)),
+         IsService      = tobool(column_ifexists('is_service_account', false)),
+         ManagerUpn     = tostring(column_ifexists('manager_upn', '')),
+         LastSignin     = todatetime(column_ifexists('last_signin', ''))
+| where IsPrivileged and Enabled
+| where isempty(LastSignin) or LastSignin < ago(stale_days)
+| extend Orphaned = IsService and isempty(ManagerUpn)
+| extend DaysSinceSignin = iff(isempty(LastSignin), -1,
+                               datetime_diff('day', now(), LastSignin))
+| extend Severity = iff(Orphaned, "High", "Medium")
+| project Upn, Enabled, IsService, ManagerUpn, LastSignin, DaysSinceSignin, Orphaned, Severity
+| sort by Severity desc, DaysSinceSignin desc

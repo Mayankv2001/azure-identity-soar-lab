@@ -1,0 +1,41 @@
+id: DET-003
+name: Conditional Access Policy Modified or Deleted
+version: 1.0.0
+kind: Scheduled
+severity: High
+status: Enabled
+description: >-
+  Fires on every update or deletion of a Conditional Access policy. Policy
+  weakening is a classic defence-evasion step after an administrative account
+  is compromised - in the sample data, a compromised service-desk account
+  disables the policy requiring MFA for admin roles. Escalates when the actor
+  holds no Conditional Access management role.
+data_sources:
+  - AuditLogs
+tactics:
+  - DefenseEvasion
+  - Persistence
+techniques:
+  - T1556.009
+query_file: ./DET-003-conditional-access-change.kql
+query_frequency: PT15M
+query_period: P1D
+trigger_operator: GreaterThan
+trigger_threshold: 0
+entity_mappings:
+  - entity_type: Account
+    field: ActorUPN
+  - entity_type: IP
+    field: ActorIP
+local_detection: detect_ca_policy_change
+tuning:
+  known_false_positives:
+    - Approved change-window modifications by the identity platform team.
+    - Emergency changes during availability incidents (validate retrospectively).
+  exclusions: []
+sla:
+  ack_minutes: 30
+  resolve_hours: 8
+references:
+  - https://attack.mitre.org/techniques/T1556/009/
+  - https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview

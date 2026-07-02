@@ -1,0 +1,39 @@
+// DET-006 | Anomalous CyberArk Privileged Credential Checkout | v1.0.0
+// Tactics: Privilege Escalation, Lateral Movement | Technique: T1078.002 (Valid Accounts: Domain Accounts)
+//
+// Two ticketless-checkout behaviours that should never be routine:
+//   1. Four or more checkouts by one user within 60 minutes with no change ticket.
+//   2. Any checkout between 00:00 and 05:00 local time with no change ticket.
+// Checkouts touching the Tier-0 domain-admins safe escalate to Critical.
+//
+// Notes
+// - Assumes CyberArk EPV/PSM events are ingested into the custom table
+//   CyberArk_EPV_CL (syslog/CEF via AMA, or the Logs Ingestion API); classic
+//   custom-log columns carry the _s string suffix.
+// - Local time for the SOC is UTC+10 (Australia/Sydney) in this environment.
+// - The offline engine (detect_cyberark_anomaly) mirrors both behaviours.
+let burst_threshold = 4;
+let no_ticket =
+    CyberArk_EPV_CL
+    | where TimeGenerated > ago(1d)
+    | where EventType_s == "PasswordCheckout" and isempty(TicketId_s);
+let bursts =
+    no_ticket
+    | summarize Checkouts = count(), Safes = make_set(SafeName_s, 10),
+                Accounts = make_set(AccountName_s, 10),
+                WindowStart = min(TimeGenerated), WindowEnd = max(TimeGenerated)
+        by Username_s, Window = bin(TimeGenerated, 1h)
+    | where Checkouts >= burst_threshold;
+let quiet_hours =
+    no_ticket
+    | extend LocalTime = datetime_add('hour', 10, TimeGenerated)
+    | where hourofday(LocalTime) between (0 .. 4)
+    | summarize Checkouts = count(), Safes = make_set(SafeName_s, 10),
+                Accounts = make_set(AccountName_s, 10),
+                WindowStart = min(TimeGenerated), WindowEnd = max(TimeGenerated)
+        by Username_s, Window = bin(TimeGenerated, 1h);
+union bursts, quiet_hours
+| summarize arg_max(Checkouts, *) by Username_s, Window
+| extend Severity = iff(Safes has "AZ-PROD-DomainAdmins", "Critical", "Medium")
+| project WindowStart, WindowEnd, Username = Username_s, Checkouts, Safes, Accounts, Severity
+| sort by WindowStart asc

@@ -1,0 +1,41 @@
+// DET-002 | Impossible Travel Sign-in | v1.1.0
+// Tactics: Initial Access, Defense Evasion | Technique: T1078.004 (Valid Accounts: Cloud Accounts)
+//
+// Flags consecutive successful sign-ins for one user whose implied travel speed
+// exceeds 900 km/h. v1.1.0 adds the tuning exclusion for corporate VPN egress
+// (both endpoints inside 198.51.100.0/24), which removed the recurring benign
+// alert caused by VPN nodes in different cities - see tuning notes in the YAML.
+//
+// Notes
+// - Written for the production SigninLogs table; in production, coordinates come
+//   from LocationDetails.geoCoordinates. The lab's flattened sample schema exposes
+//   Latitude/Longitude directly - the offline engine (detect_impossible_travel)
+//   applies identical thresholds.
+// - geo_distance_2points(lon1, lat1, lon2, lat2) returns metres.
+let speed_threshold_kmh = 900.0;
+let vpn_egress = "198.51.100.0/24";
+SigninLogs
+| where TimeGenerated > ago(1d)
+| where ResultType == 0
+| extend Lat = todouble(LocationDetails.geoCoordinates.latitude),
+         Lon = todouble(LocationDetails.geoCoordinates.longitude),
+         City = tostring(LocationDetails.city)
+| where isnotempty(Lat) and isnotempty(Lon)
+| sort by UserPrincipalName asc, TimeGenerated asc
+| serialize
+| extend PrevUser = prev(UserPrincipalName), PrevTime = prev(TimeGenerated),
+         PrevLat = prev(Lat), PrevLon = prev(Lon),
+         PrevIP = prev(IPAddress), PrevCity = prev(City)
+| where UserPrincipalName == PrevUser
+| extend DistanceKm = geo_distance_2points(PrevLon, PrevLat, Lon, Lat) / 1000.0
+| extend Hours = max_of(datetime_diff('second', TimeGenerated, PrevTime), 60) / 3600.0
+| extend SpeedKmh = DistanceKm / Hours
+| where SpeedKmh > speed_threshold_kmh
+// v1.1.0 tuning: suppress hops between corporate VPN egress nodes
+| where not(ipv4_is_in_range(IPAddress, vpn_egress) and ipv4_is_in_range(PrevIP, vpn_egress))
+| project TimeGenerated, UserPrincipalName,
+          Leg = strcat(PrevCity, " -> ", City),
+          PrevIP, IPAddress,
+          DistanceKm = round(DistanceKm, 0), SpeedKmh = round(SpeedKmh, 0),
+          RiskLevelDuringSignIn, AppDisplayName
+| sort by TimeGenerated asc
