@@ -1,0 +1,905 @@
+[
+  {
+    "alert_id": "AL-002-0001",
+    "detection_id": "DET-002",
+    "detection_name": "Impossible Travel Sign-in",
+    "mitre_tactics": [
+      "InitialAccess",
+      "DefenseEvasion"
+    ],
+    "mitre_techniques": [
+      "T1078.004"
+    ],
+    "user": "daniel.wright@contoso.com",
+    "target": null,
+    "ips": [
+      "192.0.2.44",
+      "203.0.113.34"
+    ],
+    "window_start": "2026-06-28T00:05:00Z",
+    "window_end": "2026-06-28T01:10:00Z",
+    "evidence_count": 2,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-28T00:05:00Z",
+        "UserPrincipalName": "daniel.wright@contoso.com",
+        "UserId": "u-1002",
+        "AppDisplayName": "Microsoft Teams",
+        "IPAddress": "203.0.113.34",
+        "City": "Sydney",
+        "Country": "AU",
+        "Latitude": -33.8688,
+        "Longitude": 151.2093,
+        "DeviceOS": "iOS 17",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "none",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "502cf0ee-224a-66a6-ac0f-680115b24e1d",
+        "SimScenario": "impossible_travel"
+      },
+      {
+        "TimeGenerated": "2026-06-28T01:10:00Z",
+        "UserPrincipalName": "daniel.wright@contoso.com",
+        "UserId": "u-1002",
+        "AppDisplayName": "Outlook Web",
+        "IPAddress": "192.0.2.44",
+        "City": "Frankfurt",
+        "Country": "DE",
+        "Latitude": 50.1109,
+        "Longitude": 8.6821,
+        "DeviceOS": "Windows 11",
+        "DeviceBrowser": "Edge 126",
+        "AuthenticationRequirement": "singleFactorAuthentication",
+        "MfaResult": null,
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "high",
+        "ConditionalAccessStatus": "notApplied",
+        "CorrelationId": "5f90fc87-2edc-017e-1df0-5d184e2d6255",
+        "SimScenario": "impossible_travel"
+      }
+    ],
+    "base_severity": "Medium",
+    "severity": "High",
+    "severity_score": 3,
+    "severity_modifiers": [
+      "high-risk sign-in in evidence (+1)"
+    ],
+    "scenario_tags": [
+      "impossible_travel"
+    ]
+  },
+  {
+    "alert_id": "AL-006-0001",
+    "detection_id": "DET-006",
+    "detection_name": "Anomalous CyberArk Privileged Credential Checkout",
+    "mitre_tactics": [
+      "PrivilegeEscalation",
+      "LateralMovement"
+    ],
+    "mitre_techniques": [
+      "T1078.002"
+    ],
+    "user": "mark.taylor@contoso.com",
+    "target": null,
+    "ips": [
+      "203.0.113.60"
+    ],
+    "window_start": "2026-06-28T16:05:00Z",
+    "window_end": "2026-06-28T16:45:00Z",
+    "evidence_count": 5,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-28T16:05:00Z",
+        "EventType": "PasswordCheckout",
+        "Username": "mark.taylor@contoso.com",
+        "SafeName": "AZ-PROD-DomainAdmins",
+        "AccountName": "da-admin01",
+        "TargetSystem": "da-admin01.prod.contoso.local",
+        "SourceIP": "203.0.113.60",
+        "TicketId": null,
+        "Reason": "emergency maintenance - approved verbally",
+        "SimScenario": "cyberark_anomaly"
+      },
+      {
+        "TimeGenerated": "2026-06-28T16:14:00Z",
+        "EventType": "PasswordCheckout",
+        "Username": "mark.taylor@contoso.com",
+        "SafeName": "AZ-PROD-DomainAdmins",
+        "AccountName": "da-admin02",
+        "TargetSystem": "da-admin02.prod.contoso.local",
+        "SourceIP": "203.0.113.60",
+        "TicketId": null,
+        "Reason": "emergency maintenance - approved verbally",
+        "SimScenario": "cyberark_anomaly"
+      },
+      {
+        "TimeGenerated": "2026-06-28T16:22:00Z",
+        "EventType": "PasswordCheckout",
+        "Username": "mark.taylor@contoso.com",
+        "SafeName": "AZ-PROD-DomainAdmins",
+        "AccountName": "da-admin03",
+        "TargetSystem": "da-admin03.prod.contoso.local",
+        "SourceIP": "203.0.113.60",
+        "TicketId": null,
+        "Reason": "emergency maintenance - approved verbally",
+        "SimScenario": "cyberark_anomaly"
+      },
+      {
+        "TimeGenerated": "2026-06-28T16:33:00Z",
+        "EventType": "PasswordCheckout",
+        "Username": "mark.taylor@contoso.com",
+        "SafeName": "AZ-PROD-DomainAdmins",
+        "AccountName": "svc-sql-prod",
+        "TargetSystem": "svc-sql-prod.prod.contoso.local",
+        "SourceIP": "203.0.113.60",
+        "TicketId": null,
+        "Reason": "emergency maintenance - approved verbally",
+        "SimScenario": "cyberark_anomaly"
+      },
+      {
+        "TimeGenerated": "2026-06-28T16:45:00Z",
+        "EventType": "PasswordCheckout",
+        "Username": "mark.taylor@contoso.com",
+        "SafeName": "AZ-PROD-DomainAdmins",
+        "AccountName": "da-admin01",
+        "TargetSystem": "da-admin01.prod.contoso.local",
+        "SourceIP": "203.0.113.60",
+        "TicketId": null,
+        "Reason": "emergency maintenance - approved verbally",
+        "SimScenario": "cyberark_anomaly"
+      }
+    ],
+    "base_severity": "Medium",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "detection escalation: checkout targeted the production domain-admins safe (+1)"
+    ],
+    "scenario_tags": [
+      "cyberark_anomaly"
+    ]
+  },
+  {
+    "alert_id": "AL-002-0002",
+    "detection_id": "DET-002",
+    "detection_name": "Impossible Travel Sign-in",
+    "mitre_tactics": [
+      "InitialAccess",
+      "DefenseEvasion"
+    ],
+    "mitre_techniques": [
+      "T1078.004"
+    ],
+    "user": "amelia.chen@contoso.com",
+    "target": null,
+    "ips": [
+      "192.0.2.199",
+      "203.0.113.21"
+    ],
+    "window_start": "2026-06-29T05:22:28Z",
+    "window_end": "2026-06-29T11:31:40Z",
+    "evidence_count": 2,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T05:22:28Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "SharePoint Online",
+        "IPAddress": "203.0.113.21",
+        "City": "Sydney",
+        "Country": "AU",
+        "Latitude": -33.8688,
+        "Longitude": 151.2093,
+        "DeviceOS": "iOS 17",
+        "DeviceBrowser": "Edge 126",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "none",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "12d2fa06-49e1-cd13-8da0-04955cce5ba9",
+        "SimScenario": "benign"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:31:40Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "high",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "b4bba73f-ac70-51d1-d051-267f2c2ac34b",
+        "SimScenario": "mfa_fatigue"
+      }
+    ],
+    "base_severity": "Medium",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "high-risk sign-in in evidence (+1)"
+    ],
+    "scenario_tags": [
+      "benign",
+      "mfa_fatigue"
+    ]
+  },
+  {
+    "alert_id": "AL-001-0001",
+    "detection_id": "DET-001",
+    "detection_name": "MFA Fatigue (Push Bombing)",
+    "mitre_tactics": [
+      "CredentialAccess"
+    ],
+    "mitre_techniques": [
+      "T1621"
+    ],
+    "user": "amelia.chen@contoso.com",
+    "target": null,
+    "ips": [
+      "192.0.2.199"
+    ],
+    "window_start": "2026-06-29T11:15:00Z",
+    "window_end": "2026-06-29T11:31:40Z",
+    "evidence_count": 8,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T11:15:00Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "iOS 17",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "denied",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "979aa051-7317-591a-3283-daa4e212ab7c",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:16:07Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Chrome 126",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "denied",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "34ae4abd-36fc-e0ac-b469-8db30123a348",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:17:11Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "timeout",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "93cd1291-1004-2d82-cbc7-2f1acf08ea54",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:18:22Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "Windows 11",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "denied",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "327375bf-5373-bf4d-5da4-9cb92fdc9992",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:19:35Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Edge 126",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "denied",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "7d4ed26e-dcd5-bfae-abb3-16a743299780",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:20:49Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "iOS 17",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "timeout",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "9c7eb575-637d-dcd6-98d3-148b503b4078",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:21:52Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "denied",
+        "ResultType": 500121,
+        "ResultDescription": "MFA denied; user declined or did not respond",
+        "RiskLevelDuringSignIn": "medium",
+        "ConditionalAccessStatus": "failure",
+        "CorrelationId": "d873dad9-5a1b-af0e-5911-96dc1d3e503a",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-29T11:31:40Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "high",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "b4bba73f-ac70-51d1-d051-267f2c2ac34b",
+        "SimScenario": "mfa_fatigue"
+      }
+    ],
+    "base_severity": "High",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "high-risk sign-in in evidence (+1)",
+      "detection escalation: user approved MFA immediately after the prompt burst (+1)"
+    ],
+    "scenario_tags": [
+      "mfa_fatigue"
+    ]
+  },
+  {
+    "alert_id": "AL-002-0003",
+    "detection_id": "DET-002",
+    "detection_name": "Impossible Travel Sign-in",
+    "mitre_tactics": [
+      "InitialAccess",
+      "DefenseEvasion"
+    ],
+    "mitre_techniques": [
+      "T1078.004"
+    ],
+    "user": "amelia.chen@contoso.com",
+    "target": null,
+    "ips": [
+      "192.0.2.199",
+      "203.0.113.21"
+    ],
+    "window_start": "2026-06-29T11:31:40Z",
+    "window_end": "2026-06-30T00:11:36Z",
+    "evidence_count": 2,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T11:31:40Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "192.0.2.199",
+        "City": "Amsterdam",
+        "Country": "NL",
+        "Latitude": 52.3676,
+        "Longitude": 4.9041,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Safari 17",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "high",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "b4bba73f-ac70-51d1-d051-267f2c2ac34b",
+        "SimScenario": "mfa_fatigue"
+      },
+      {
+        "TimeGenerated": "2026-06-30T00:11:36Z",
+        "UserPrincipalName": "amelia.chen@contoso.com",
+        "UserId": "u-1001",
+        "AppDisplayName": "SharePoint Online",
+        "IPAddress": "203.0.113.21",
+        "City": "Sydney",
+        "Country": "AU",
+        "Latitude": -33.8688,
+        "Longitude": 151.2093,
+        "DeviceOS": "Windows 11",
+        "DeviceBrowser": "Chrome 126",
+        "AuthenticationRequirement": "singleFactorAuthentication",
+        "MfaResult": null,
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "none",
+        "ConditionalAccessStatus": "notApplied",
+        "CorrelationId": "553d2625-e833-4da5-de95-d6953579c143",
+        "SimScenario": "benign"
+      }
+    ],
+    "base_severity": "Medium",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "high-risk sign-in in evidence (+1)"
+    ],
+    "scenario_tags": [
+      "benign",
+      "mfa_fatigue"
+    ]
+  },
+  {
+    "alert_id": "AL-004-0001",
+    "detection_id": "DET-004",
+    "detection_name": "New Credential Added to Service Principal",
+    "mitre_tactics": [
+      "Persistence",
+      "PrivilegeEscalation"
+    ],
+    "mitre_techniques": [
+      "T1098.001"
+    ],
+    "user": "jordan.lee@contoso.com",
+    "target": "sp-automation-graph",
+    "ips": [
+      "192.0.2.199"
+    ],
+    "window_start": "2026-06-29T13:05:00Z",
+    "window_end": "2026-06-29T13:05:00Z",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T13:05:00Z",
+        "OperationName": "Add service principal credentials",
+        "Category": "ApplicationManagement",
+        "ActorUPN": "jordan.lee@contoso.com",
+        "ActorIPAddress": "192.0.2.199",
+        "TargetType": "ServicePrincipal",
+        "TargetName": "sp-automation-graph",
+        "TargetId": "sp-9001",
+        "ModifiedProperties": [
+          {
+            "name": "KeyDescription",
+            "oldValue": null,
+            "newValue": "client secret added (expires 2028-06-29)"
+          }
+        ],
+        "Result": "success",
+        "CorrelationId": "ade68f51-e670-93a0-fc48-f61583b0b35c",
+        "SimScenario": "sp_credential_added"
+      }
+    ],
+    "base_severity": "High",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "detection escalation: target service principal is classified high-privilege (+1)"
+    ],
+    "scenario_tags": [
+      "sp_credential_added"
+    ]
+  },
+  {
+    "alert_id": "AL-005-0001",
+    "detection_id": "DET-005",
+    "detection_name": "Account Added to Privileged Role or Group",
+    "mitre_tactics": [
+      "PrivilegeEscalation",
+      "Persistence"
+    ],
+    "mitre_techniques": [
+      "T1098.003",
+      "T1098.007"
+    ],
+    "user": "jordan.lee@contoso.com",
+    "target": "jordan.lee@contoso.com",
+    "ips": [
+      "192.0.2.199"
+    ],
+    "window_start": "2026-06-29T13:20:00Z",
+    "window_end": "2026-06-29T13:20:00Z",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T13:20:00Z",
+        "OperationName": "Add member to role",
+        "Category": "RoleManagement",
+        "ActorUPN": "jordan.lee@contoso.com",
+        "ActorIPAddress": "192.0.2.199",
+        "TargetType": "User",
+        "TargetName": "jordan.lee@contoso.com",
+        "TargetId": "u-1004",
+        "ModifiedProperties": [
+          {
+            "name": "Role.DisplayName",
+            "oldValue": null,
+            "newValue": "Global Administrator"
+          }
+        ],
+        "Result": "success",
+        "CorrelationId": "f67839b2-22b5-f457-1860-ad28d0afb235",
+        "SimScenario": "priv_group_add"
+      }
+    ],
+    "base_severity": "High",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "detection escalation: actor granted the privilege to their own account (+1)"
+    ],
+    "scenario_tags": [
+      "priv_group_add"
+    ]
+  },
+  {
+    "alert_id": "AL-003-0001",
+    "detection_id": "DET-003",
+    "detection_name": "Conditional Access Policy Modified or Deleted",
+    "mitre_tactics": [
+      "DefenseEvasion",
+      "Persistence"
+    ],
+    "mitre_techniques": [
+      "T1556.009"
+    ],
+    "user": "jordan.lee@contoso.com",
+    "target": null,
+    "ips": [
+      "192.0.2.199"
+    ],
+    "window_start": "2026-06-29T13:35:00Z",
+    "window_end": "2026-06-29T13:35:00Z",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T13:35:00Z",
+        "OperationName": "Update conditional access policy",
+        "Category": "Policy",
+        "ActorUPN": "jordan.lee@contoso.com",
+        "ActorIPAddress": "192.0.2.199",
+        "TargetType": "Policy",
+        "TargetName": "CA004 - Require MFA for admin roles",
+        "TargetId": "pol-ca004",
+        "ModifiedProperties": [
+          {
+            "name": "PolicyState",
+            "oldValue": "enabled",
+            "newValue": "disabled"
+          }
+        ],
+        "Result": "success",
+        "CorrelationId": "eb346d3a-695e-5ea9-c923-0c64c0062b5b",
+        "SimScenario": "ca_policy_change"
+      }
+    ],
+    "base_severity": "High",
+    "severity": "Critical",
+    "severity_score": 4,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "activity outside business hours (+1)",
+      "detection escalation: actor holds no Conditional Access management role (+1)"
+    ],
+    "scenario_tags": [
+      "ca_policy_change"
+    ]
+  },
+  {
+    "alert_id": "AL-002-0004",
+    "detection_id": "DET-002",
+    "detection_name": "Impossible Travel Sign-in",
+    "mitre_tactics": [
+      "InitialAccess",
+      "DefenseEvasion"
+    ],
+    "mitre_techniques": [
+      "T1078.004"
+    ],
+    "user": "sofia.russo@contoso.com",
+    "target": null,
+    "ips": [
+      "198.51.100.10",
+      "198.51.100.77"
+    ],
+    "window_start": "2026-06-29T23:40:00Z",
+    "window_end": "2026-06-30T00:15:00Z",
+    "evidence_count": 2,
+    "evidence": [
+      {
+        "TimeGenerated": "2026-06-29T23:40:00Z",
+        "UserPrincipalName": "sofia.russo@contoso.com",
+        "UserId": "u-1006",
+        "AppDisplayName": "Azure Portal",
+        "IPAddress": "198.51.100.10",
+        "City": "Sydney",
+        "Country": "AU",
+        "Latitude": -33.8688,
+        "Longitude": 151.2093,
+        "DeviceOS": "iOS 17",
+        "DeviceBrowser": "Chrome 126",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "none",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "93267d25-234b-4562-98af-5cca6b11b7cb",
+        "SimScenario": "vpn_travel_fp"
+      },
+      {
+        "TimeGenerated": "2026-06-30T00:15:00Z",
+        "UserPrincipalName": "sofia.russo@contoso.com",
+        "UserId": "u-1006",
+        "AppDisplayName": "Outlook Web",
+        "IPAddress": "198.51.100.77",
+        "City": "Singapore",
+        "Country": "SG",
+        "Latitude": 1.3521,
+        "Longitude": 103.8198,
+        "DeviceOS": "macOS 14",
+        "DeviceBrowser": "Edge 126",
+        "AuthenticationRequirement": "multiFactorAuthentication",
+        "MfaResult": "approved",
+        "ResultType": 0,
+        "ResultDescription": "Success",
+        "RiskLevelDuringSignIn": "none",
+        "ConditionalAccessStatus": "success",
+        "CorrelationId": "b184d1fc-8991-b01a-a2b0-3c4b7c966b55",
+        "SimScenario": "vpn_travel_fp"
+      }
+    ],
+    "base_severity": "Medium",
+    "severity": "Medium",
+    "severity_score": 2,
+    "severity_modifiers": [],
+    "scenario_tags": [
+      "vpn_travel_fp"
+    ]
+  },
+  {
+    "alert_id": "AL-007-0001",
+    "detection_id": "DET-007",
+    "detection_name": "Stale or Orphaned Privileged Account",
+    "mitre_tactics": [
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078"
+    ],
+    "user": "old.admin@contoso.com",
+    "target": null,
+    "ips": [],
+    "window_start": "2026-07-01T00:00:00Z",
+    "window_end": "2026-07-01T00:00:00Z",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "upn": "old.admin@contoso.com",
+        "user_id": "u-1010",
+        "display_name": "Legacy Administrator",
+        "department": "IT Operations",
+        "title": "Systems Administrator (legacy)",
+        "entra_roles": [
+          "Exchange Administrator"
+        ],
+        "groups": [
+          "sg-cloud-ops"
+        ],
+        "is_privileged": true,
+        "is_service_account": false,
+        "mfa_registered": false,
+        "account_enabled": true,
+        "manager_upn": "priya.sharma@contoso.com",
+        "created_date": "2019-04-02",
+        "last_signin": "2026-03-02T04:11:00Z",
+        "usual_city": "Sydney",
+        "usual_ip": "203.0.113.11"
+      }
+    ],
+    "base_severity": "Low",
+    "severity": "Medium",
+    "severity_score": 2,
+    "severity_modifiers": [
+      "privileged identity involved (+1)"
+    ],
+    "scenario_tags": [
+      "stale_privileged"
+    ]
+  },
+  {
+    "alert_id": "AL-007-0002",
+    "detection_id": "DET-007",
+    "detection_name": "Stale or Orphaned Privileged Account",
+    "mitre_tactics": [
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078"
+    ],
+    "user": "karen.mills@contoso.com",
+    "target": null,
+    "ips": [],
+    "window_start": "2026-07-01T00:00:00Z",
+    "window_end": "2026-07-01T00:00:00Z",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "upn": "karen.mills@contoso.com",
+        "user_id": "u-1011",
+        "display_name": "Karen Mills",
+        "department": "IT Security",
+        "title": "Contractor - Identity Project",
+        "entra_roles": [
+          "User Administrator"
+        ],
+        "groups": [
+          "sg-identity-team"
+        ],
+        "is_privileged": true,
+        "is_service_account": false,
+        "mfa_registered": false,
+        "account_enabled": true,
+        "manager_upn": "amelia.chen@contoso.com",
+        "created_date": "2025-12-10",
+        "last_signin": null,
+        "usual_city": "Sydney",
+        "usual_ip": "203.0.113.12"
+      }
+    ],
+    "base_severity": "Low",
+    "severity": "Medium",
+    "severity_score": 2,
+    "severity_modifiers": [
+      "privileged identity involved (+1)"
+    ],
+    "scenario_tags": [
+      "stale_privileged"
+    ]
+  },
+  {
+    "alert_id": "AL-007-0003",
+    "detection_id": "DET-007",
+    "detection_name": "Stale or Orphaned Privileged Account",
+    "mitre_tactics": [
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078"
+    ],
+    "user": "svc-backup-legacy@contoso.com",
+    "target": null,
+    "ips": [],
+    "window_start": "2026-07-01T00:00:00Z",
+    "window_end": "2026-07-01T00:00:00Z",
+    "evidence_count": 1,
+    "evidence": [
+      {
+        "upn": "svc-backup-legacy@contoso.com",
+        "user_id": "u-1012",
+        "display_name": "svc-backup-legacy",
+        "department": "IT Operations",
+        "title": "Service Account - Legacy Backup",
+        "entra_roles": [],
+        "groups": [
+          "sg-prod-domain-admins"
+        ],
+        "is_privileged": true,
+        "is_service_account": true,
+        "mfa_registered": false,
+        "account_enabled": true,
+        "manager_upn": null,
+        "created_date": "2020-07-19",
+        "last_signin": "2026-01-15T13:40:00Z",
+        "usual_city": "Sydney",
+        "usual_ip": "203.0.113.13"
+      }
+    ],
+    "base_severity": "Low",
+    "severity": "High",
+    "severity_score": 3,
+    "severity_modifiers": [
+      "privileged identity involved (+1)",
+      "detection escalation: orphaned privileged service account (no owner) (+1)"
+    ],
+    "scenario_tags": [
+      "stale_privileged"
+    ]
+  }
+]

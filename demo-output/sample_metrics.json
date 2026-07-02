@@ -1,0 +1,43 @@
+{
+  "reporting_window": "2026-06-24 to 2026-06-30 (simulation clock 2026-07-01T00:00Z)",
+  "alert_count": 12,
+  "incident_count": 8,
+  "alerts_by_detection": {
+    "DET-001": 1,
+    "DET-002": 4,
+    "DET-003": 1,
+    "DET-004": 1,
+    "DET-005": 1,
+    "DET-006": 1,
+    "DET-007": 3
+  },
+  "alerts_by_severity": {
+    "Critical": 7,
+    "High": 2,
+    "Medium": 3
+  },
+  "mttd_minutes": 83.5,
+  "mttr_minutes": 763.4,
+  "sla_adherence_pct": 93.8,
+  "sla_breaches": [
+    {
+      "incident_id": "INC-1005",
+      "kind": "acknowledge",
+      "severity": "Medium",
+      "actual": 265,
+      "target": 240,
+      "met": false
+    }
+  ],
+  "false_positive_rate_pct": 12.5,
+  "false_positive_incidents": [
+    "INC-1005"
+  ],
+  "tuning_impact": {
+    "DET-002": {
+      "before": 4,
+      "after": 3
+    }
+  },
+  "false_positive_rate_after_tuning_pct": 0.0
+}

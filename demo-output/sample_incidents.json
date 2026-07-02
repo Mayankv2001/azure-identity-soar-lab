@@ -1,0 +1,661 @@
+[
+  {
+    "incident_id": "INC-1001",
+    "title": "Impossible Travel Sign-in - daniel.wright@contoso.com",
+    "severity": "High",
+    "user": "daniel.wright@contoso.com",
+    "ips": [
+      "192.0.2.44",
+      "203.0.113.34"
+    ],
+    "alert_ids": [
+      "AL-002-0001"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-002-0001",
+        "detection_id": "DET-002",
+        "detection_name": "Impossible Travel Sign-in",
+        "severity": "High",
+        "severity_score": 3,
+        "severity_modifiers": [
+          "high-risk sign-in in evidence (+1)"
+        ],
+        "mitre_tactics": [
+          "InitialAccess",
+          "DefenseEvasion"
+        ],
+        "mitre_techniques": [
+          "T1078.004"
+        ],
+        "user": "daniel.wright@contoso.com",
+        "target": null,
+        "ips": [
+          "192.0.2.44",
+          "203.0.113.34"
+        ],
+        "window_start": "2026-06-28T00:05:00Z",
+        "window_end": "2026-06-28T01:10:00Z",
+        "evidence_count": 2,
+        "scenario_tags": [
+          "impossible_travel"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "DefenseEvasion",
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078.004"
+    ],
+    "created_at": "2026-06-28T01:10:00Z",
+    "acknowledged_at": "2026-06-28T01:29:00Z",
+    "resolved_at": "2026-06-28T06:43:00Z",
+    "ack_minutes": 19,
+    "resolve_minutes": 333,
+    "status": "resolved",
+    "disposition": "true_positive",
+    "triage_steps": [
+      "Compare device, browser and application fingerprints of both sign-ins against the user's baseline.",
+      "Check whether either IP address belongs to corporate VPN egress or a known cloud proxy.",
+      "Confirm actual travel with the user or their manager.",
+      "If unexplained, revoke sessions, reset credentials and flag the account in Microsoft Entra ID Protection.",
+      "Hunt for follow-on activity from the foreign IP (mailbox rules, mass downloads, consent grants).",
+      "If VPN egress is confirmed, record the incident as benign and raise a tuning exclusion for the range."
+    ]
+  },
+  {
+    "incident_id": "INC-1002",
+    "title": "Anomalous CyberArk Privileged Credential Checkout - mark.taylor@contoso.com",
+    "severity": "Critical",
+    "user": "mark.taylor@contoso.com",
+    "ips": [
+      "203.0.113.60"
+    ],
+    "alert_ids": [
+      "AL-006-0001"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-006-0001",
+        "detection_id": "DET-006",
+        "detection_name": "Anomalous CyberArk Privileged Credential Checkout",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "detection escalation: checkout targeted the production domain-admins safe (+1)"
+        ],
+        "mitre_tactics": [
+          "PrivilegeEscalation",
+          "LateralMovement"
+        ],
+        "mitre_techniques": [
+          "T1078.002"
+        ],
+        "user": "mark.taylor@contoso.com",
+        "target": null,
+        "ips": [
+          "203.0.113.60"
+        ],
+        "window_start": "2026-06-28T16:05:00Z",
+        "window_end": "2026-06-28T16:45:00Z",
+        "evidence_count": 5,
+        "scenario_tags": [
+          "cyberark_anomaly"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "LateralMovement",
+      "PrivilegeEscalation"
+    ],
+    "mitre_techniques": [
+      "T1078.002"
+    ],
+    "created_at": "2026-06-28T16:45:00Z",
+    "acknowledged_at": "2026-06-28T16:56:00Z",
+    "resolved_at": "2026-06-28T19:20:00Z",
+    "ack_minutes": 11,
+    "resolve_minutes": 155,
+    "status": "resolved",
+    "disposition": "true_positive",
+    "triage_steps": [
+      "Check for a change ticket or incident record justifying the checkouts; note that none was supplied.",
+      "Contact the user and their manager to verify the stated reason.",
+      "Review CyberArk PSM session recordings for each checked-out account.",
+      "Inspect target systems for logons and changes during the checkout window.",
+      "Force check-in and rotate the checked-out credentials.",
+      "If unverified, suspend the user's safe access pending investigation (insider or compromise).",
+      "Record root cause: why does policy permit ticketless checkout on a Tier-0 safe?"
+    ]
+  },
+  {
+    "incident_id": "INC-1003",
+    "title": "Correlated identity attack (3 detections) - amelia.chen@contoso.com",
+    "severity": "Critical",
+    "user": "amelia.chen@contoso.com",
+    "ips": [
+      "192.0.2.199",
+      "203.0.113.21"
+    ],
+    "alert_ids": [
+      "AL-002-0002",
+      "AL-001-0001",
+      "AL-002-0003"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-002-0002",
+        "detection_id": "DET-002",
+        "detection_name": "Impossible Travel Sign-in",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "high-risk sign-in in evidence (+1)"
+        ],
+        "mitre_tactics": [
+          "InitialAccess",
+          "DefenseEvasion"
+        ],
+        "mitre_techniques": [
+          "T1078.004"
+        ],
+        "user": "amelia.chen@contoso.com",
+        "target": null,
+        "ips": [
+          "192.0.2.199",
+          "203.0.113.21"
+        ],
+        "window_start": "2026-06-29T05:22:28Z",
+        "window_end": "2026-06-29T11:31:40Z",
+        "evidence_count": 2,
+        "scenario_tags": [
+          "benign",
+          "mfa_fatigue"
+        ]
+      },
+      {
+        "alert_id": "AL-001-0001",
+        "detection_id": "DET-001",
+        "detection_name": "MFA Fatigue (Push Bombing)",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "high-risk sign-in in evidence (+1)",
+          "detection escalation: user approved MFA immediately after the prompt burst (+1)"
+        ],
+        "mitre_tactics": [
+          "CredentialAccess"
+        ],
+        "mitre_techniques": [
+          "T1621"
+        ],
+        "user": "amelia.chen@contoso.com",
+        "target": null,
+        "ips": [
+          "192.0.2.199"
+        ],
+        "window_start": "2026-06-29T11:15:00Z",
+        "window_end": "2026-06-29T11:31:40Z",
+        "evidence_count": 8,
+        "scenario_tags": [
+          "mfa_fatigue"
+        ]
+      },
+      {
+        "alert_id": "AL-002-0003",
+        "detection_id": "DET-002",
+        "detection_name": "Impossible Travel Sign-in",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "high-risk sign-in in evidence (+1)"
+        ],
+        "mitre_tactics": [
+          "InitialAccess",
+          "DefenseEvasion"
+        ],
+        "mitre_techniques": [
+          "T1078.004"
+        ],
+        "user": "amelia.chen@contoso.com",
+        "target": null,
+        "ips": [
+          "192.0.2.199",
+          "203.0.113.21"
+        ],
+        "window_start": "2026-06-29T11:31:40Z",
+        "window_end": "2026-06-30T00:11:36Z",
+        "evidence_count": 2,
+        "scenario_tags": [
+          "benign",
+          "mfa_fatigue"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "CredentialAccess",
+      "DefenseEvasion",
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078.004",
+      "T1621"
+    ],
+    "created_at": "2026-06-29T11:31:40Z",
+    "acknowledged_at": "2026-06-29T11:38:40Z",
+    "resolved_at": "2026-06-29T13:59:40Z",
+    "ack_minutes": 7,
+    "resolve_minutes": 148,
+    "status": "resolved",
+    "disposition": "true_positive",
+    "triage_steps": [
+      "Compare device, browser and application fingerprints of both sign-ins against the user's baseline.",
+      "Check whether either IP address belongs to corporate VPN egress or a known cloud proxy.",
+      "Confirm actual travel with the user or their manager.",
+      "If unexplained, revoke sessions, reset credentials and flag the account in Microsoft Entra ID Protection.",
+      "Hunt for follow-on activity from the foreign IP (mailbox rules, mass downloads, consent grants).",
+      "If VPN egress is confirmed, record the incident as benign and raise a tuning exclusion for the range.",
+      "Contact the user out-of-band and confirm whether they approved the final MFA prompt.",
+      "Revoke refresh tokens and active sessions for the account (Microsoft Entra ID > user > Revoke sessions).",
+      "Reset the password and re-register MFA; remove unfamiliar authenticator methods and devices.",
+      "Search sign-in logs for the same source IP across other users (password spray from shared infrastructure).",
+      "Review mailbox rules and OAuth consent grants created after the approved sign-in.",
+      "Block the source IP and confirm risk-based Conditional Access covers this scenario.",
+      "Record root cause: how was a valid password obtained (phishing, reuse, infostealer)?"
+    ]
+  },
+  {
+    "incident_id": "INC-1004",
+    "title": "Correlated identity attack (3 detections) - jordan.lee@contoso.com",
+    "severity": "Critical",
+    "user": "jordan.lee@contoso.com",
+    "ips": [
+      "192.0.2.199"
+    ],
+    "alert_ids": [
+      "AL-004-0001",
+      "AL-005-0001",
+      "AL-003-0001"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-004-0001",
+        "detection_id": "DET-004",
+        "detection_name": "New Credential Added to Service Principal",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "detection escalation: target service principal is classified high-privilege (+1)"
+        ],
+        "mitre_tactics": [
+          "Persistence",
+          "PrivilegeEscalation"
+        ],
+        "mitre_techniques": [
+          "T1098.001"
+        ],
+        "user": "jordan.lee@contoso.com",
+        "target": "sp-automation-graph",
+        "ips": [
+          "192.0.2.199"
+        ],
+        "window_start": "2026-06-29T13:05:00Z",
+        "window_end": "2026-06-29T13:05:00Z",
+        "evidence_count": 1,
+        "scenario_tags": [
+          "sp_credential_added"
+        ]
+      },
+      {
+        "alert_id": "AL-005-0001",
+        "detection_id": "DET-005",
+        "detection_name": "Account Added to Privileged Role or Group",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "detection escalation: actor granted the privilege to their own account (+1)"
+        ],
+        "mitre_tactics": [
+          "PrivilegeEscalation",
+          "Persistence"
+        ],
+        "mitre_techniques": [
+          "T1098.003",
+          "T1098.007"
+        ],
+        "user": "jordan.lee@contoso.com",
+        "target": "jordan.lee@contoso.com",
+        "ips": [
+          "192.0.2.199"
+        ],
+        "window_start": "2026-06-29T13:20:00Z",
+        "window_end": "2026-06-29T13:20:00Z",
+        "evidence_count": 1,
+        "scenario_tags": [
+          "priv_group_add"
+        ]
+      },
+      {
+        "alert_id": "AL-003-0001",
+        "detection_id": "DET-003",
+        "detection_name": "Conditional Access Policy Modified or Deleted",
+        "severity": "Critical",
+        "severity_score": 4,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "activity outside business hours (+1)",
+          "detection escalation: actor holds no Conditional Access management role (+1)"
+        ],
+        "mitre_tactics": [
+          "DefenseEvasion",
+          "Persistence"
+        ],
+        "mitre_techniques": [
+          "T1556.009"
+        ],
+        "user": "jordan.lee@contoso.com",
+        "target": null,
+        "ips": [
+          "192.0.2.199"
+        ],
+        "window_start": "2026-06-29T13:35:00Z",
+        "window_end": "2026-06-29T13:35:00Z",
+        "evidence_count": 1,
+        "scenario_tags": [
+          "ca_policy_change"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "DefenseEvasion",
+      "Persistence",
+      "PrivilegeEscalation"
+    ],
+    "mitre_techniques": [
+      "T1098.001",
+      "T1098.003",
+      "T1098.007",
+      "T1556.009"
+    ],
+    "created_at": "2026-06-29T13:05:00Z",
+    "acknowledged_at": "2026-06-29T13:12:00Z",
+    "resolved_at": "2026-06-29T15:18:00Z",
+    "ack_minutes": 7,
+    "resolve_minutes": 133,
+    "status": "resolved",
+    "disposition": "true_positive",
+    "triage_steps": [
+      "Identify the service principal's API permissions and owners; classify the blast radius.",
+      "Validate the credential addition against approved change records.",
+      "If unauthorised, remove the new secret or certificate immediately.",
+      "Review the service principal's sign-in activity for any use of the new credential.",
+      "Rotate remaining credentials and audit application role assignments.",
+      "Investigate the actor account for compromise and revoke its sessions.",
+      "Confirm the role or group addition against an approved access request (PIM/JIT expected).",
+      "Treat self-elevation (actor granted the privilege to their own account) as a critical signal.",
+      "Remove the membership if it was not approved; prefer PIM-eligible over permanent assignment.",
+      "Review the actor's authentication trail around the time of the grant.",
+      "Audit all actions performed by the elevated account since the grant.",
+      "Verify detection coverage for every protected role and privileged group.",
+      "Diff the Conditional Access policy change and identify which controls were weakened.",
+      "Validate the change against change tickets and CAB approval records.",
+      "Confirm the actor holds an authorised policy-management role.",
+      "If unauthorised, revert the policy immediately and treat the actor account as compromised.",
+      "Review all other administrative actions from the same actor and IP in the surrounding hour.",
+      "Verify break-glass exclusions and alerting on policy state changes."
+    ]
+  },
+  {
+    "incident_id": "INC-1005",
+    "title": "Impossible Travel Sign-in - sofia.russo@contoso.com",
+    "severity": "Medium",
+    "user": "sofia.russo@contoso.com",
+    "ips": [
+      "198.51.100.10",
+      "198.51.100.77"
+    ],
+    "alert_ids": [
+      "AL-002-0004"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-002-0004",
+        "detection_id": "DET-002",
+        "detection_name": "Impossible Travel Sign-in",
+        "severity": "Medium",
+        "severity_score": 2,
+        "severity_modifiers": [],
+        "mitre_tactics": [
+          "InitialAccess",
+          "DefenseEvasion"
+        ],
+        "mitre_techniques": [
+          "T1078.004"
+        ],
+        "user": "sofia.russo@contoso.com",
+        "target": null,
+        "ips": [
+          "198.51.100.10",
+          "198.51.100.77"
+        ],
+        "window_start": "2026-06-29T23:40:00Z",
+        "window_end": "2026-06-30T00:15:00Z",
+        "evidence_count": 2,
+        "scenario_tags": [
+          "vpn_travel_fp"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "DefenseEvasion",
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078.004"
+    ],
+    "created_at": "2026-06-30T00:15:00Z",
+    "acknowledged_at": "2026-06-30T04:40:00Z",
+    "resolved_at": "2026-06-30T05:25:00Z",
+    "ack_minutes": 265,
+    "resolve_minutes": 310,
+    "status": "resolved",
+    "disposition": "false_positive",
+    "triage_steps": [
+      "Compare device, browser and application fingerprints of both sign-ins against the user's baseline.",
+      "Check whether either IP address belongs to corporate VPN egress or a known cloud proxy.",
+      "Confirm actual travel with the user or their manager.",
+      "If unexplained, revoke sessions, reset credentials and flag the account in Microsoft Entra ID Protection.",
+      "Hunt for follow-on activity from the foreign IP (mailbox rules, mass downloads, consent grants).",
+      "If VPN egress is confirmed, record the incident as benign and raise a tuning exclusion for the range."
+    ]
+  },
+  {
+    "incident_id": "INC-1006",
+    "title": "Stale or Orphaned Privileged Account - karen.mills@contoso.com",
+    "severity": "Medium",
+    "user": "karen.mills@contoso.com",
+    "ips": [],
+    "alert_ids": [
+      "AL-007-0002"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-007-0002",
+        "detection_id": "DET-007",
+        "detection_name": "Stale or Orphaned Privileged Account",
+        "severity": "Medium",
+        "severity_score": 2,
+        "severity_modifiers": [
+          "privileged identity involved (+1)"
+        ],
+        "mitre_tactics": [
+          "InitialAccess"
+        ],
+        "mitre_techniques": [
+          "T1078"
+        ],
+        "user": "karen.mills@contoso.com",
+        "target": null,
+        "ips": [],
+        "window_start": "2026-07-01T00:00:00Z",
+        "window_end": "2026-07-01T00:00:00Z",
+        "evidence_count": 1,
+        "scenario_tags": [
+          "stale_privileged"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078"
+    ],
+    "created_at": "2026-07-01T00:00:00Z",
+    "acknowledged_at": "2026-07-01T02:56:00Z",
+    "resolved_at": "2026-07-03T02:16:00Z",
+    "ack_minutes": 176,
+    "resolve_minutes": 3016,
+    "status": "resolved",
+    "disposition": "posture_finding",
+    "triage_steps": [
+      "Identify the business owner of the account; confirm whether it is still required.",
+      "Check for authentication attempts across cloud and on-premises in the last 90 days.",
+      "Disable the account or strip privileged roles and groups (disable-then-delete lifecycle).",
+      "For service accounts, map dependencies before disabling and plan credential rotation.",
+      "Convert any remaining need to a PIM-eligible assignment with an expiry date.",
+      "Feed the gap back into the joiner-mover-leaver process as a root-cause action."
+    ]
+  },
+  {
+    "incident_id": "INC-1007",
+    "title": "Stale or Orphaned Privileged Account - old.admin@contoso.com",
+    "severity": "Medium",
+    "user": "old.admin@contoso.com",
+    "ips": [],
+    "alert_ids": [
+      "AL-007-0001"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-007-0001",
+        "detection_id": "DET-007",
+        "detection_name": "Stale or Orphaned Privileged Account",
+        "severity": "Medium",
+        "severity_score": 2,
+        "severity_modifiers": [
+          "privileged identity involved (+1)"
+        ],
+        "mitre_tactics": [
+          "InitialAccess"
+        ],
+        "mitre_techniques": [
+          "T1078"
+        ],
+        "user": "old.admin@contoso.com",
+        "target": null,
+        "ips": [],
+        "window_start": "2026-07-01T00:00:00Z",
+        "window_end": "2026-07-01T00:00:00Z",
+        "evidence_count": 1,
+        "scenario_tags": [
+          "stale_privileged"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078"
+    ],
+    "created_at": "2026-07-01T00:00:00Z",
+    "acknowledged_at": "2026-07-01T02:39:00Z",
+    "resolved_at": "2026-07-02T03:58:00Z",
+    "ack_minutes": 159,
+    "resolve_minutes": 1678,
+    "status": "resolved",
+    "disposition": "posture_finding",
+    "triage_steps": [
+      "Identify the business owner of the account; confirm whether it is still required.",
+      "Check for authentication attempts across cloud and on-premises in the last 90 days.",
+      "Disable the account or strip privileged roles and groups (disable-then-delete lifecycle).",
+      "For service accounts, map dependencies before disabling and plan credential rotation.",
+      "Convert any remaining need to a PIM-eligible assignment with an expiry date.",
+      "Feed the gap back into the joiner-mover-leaver process as a root-cause action."
+    ]
+  },
+  {
+    "incident_id": "INC-1008",
+    "title": "Stale or Orphaned Privileged Account - svc-backup-legacy@contoso.com",
+    "severity": "High",
+    "user": "svc-backup-legacy@contoso.com",
+    "ips": [],
+    "alert_ids": [
+      "AL-007-0003"
+    ],
+    "alerts": [
+      {
+        "alert_id": "AL-007-0003",
+        "detection_id": "DET-007",
+        "detection_name": "Stale or Orphaned Privileged Account",
+        "severity": "High",
+        "severity_score": 3,
+        "severity_modifiers": [
+          "privileged identity involved (+1)",
+          "detection escalation: orphaned privileged service account (no owner) (+1)"
+        ],
+        "mitre_tactics": [
+          "InitialAccess"
+        ],
+        "mitre_techniques": [
+          "T1078"
+        ],
+        "user": "svc-backup-legacy@contoso.com",
+        "target": null,
+        "ips": [],
+        "window_start": "2026-07-01T00:00:00Z",
+        "window_end": "2026-07-01T00:00:00Z",
+        "evidence_count": 1,
+        "scenario_tags": [
+          "stale_privileged"
+        ]
+      }
+    ],
+    "mitre_tactics": [
+      "InitialAccess"
+    ],
+    "mitre_techniques": [
+      "T1078"
+    ],
+    "created_at": "2026-07-01T00:00:00Z",
+    "acknowledged_at": "2026-07-01T00:24:00Z",
+    "resolved_at": "2026-07-01T05:34:00Z",
+    "ack_minutes": 24,
+    "resolve_minutes": 334,
+    "status": "resolved",
+    "disposition": "posture_finding",
+    "triage_steps": [
+      "Identify the business owner of the account; confirm whether it is still required.",
+      "Check for authentication attempts across cloud and on-premises in the last 90 days.",
+      "Disable the account or strip privileged roles and groups (disable-then-delete lifecycle).",
+      "For service accounts, map dependencies before disabling and plan credential rotation.",
+      "Convert any remaining need to a PIM-eligible assignment with an expiry date.",
+      "Feed the gap back into the joiner-mover-leaver process as a root-cause action."
+    ]
+  }
+]
