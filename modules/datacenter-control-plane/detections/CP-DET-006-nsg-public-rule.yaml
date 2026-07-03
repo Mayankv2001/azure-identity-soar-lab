@@ -1,0 +1,29 @@
+id: CP-DET-006
+title: NSG or firewall rule opened to the internet
+description: >-
+  An inbound allow rule created or updated on a network security group with an
+  internet-wide source prefix (0.0.0.0/0, *, or Internet). This is how an
+  attacker who reached the control plane exposes an internal surface, and how
+  benign misconfiguration creates real risk.
+severity: Critical
+data_source: AzureActivity
+tactics:
+  - DefenseEvasion
+techniques:
+  - T1562.007
+false_positive_guidance: >-
+  Intentional public endpoints (web front ends, public load balancers). Scope by
+  workload tag and require change references; internal-source rules never fire.
+response_guidance: >-
+  Validate against change control. If unauthorised, revert the rule immediately
+  (low blast radius, reversible), then determine what became reachable. Pair
+  with CP-DET-007 to judge actual exposure. Chain stage 6.
+owner: Cloud Security Engineering
+version: 1.0.0
+local_detection: detect_nsg_public_rule
+test_expectation: >-
+  Fires for the 3389-from-0.0.0.0/0 rule on nsg-prod-dc-mgmt; the internal
+  10.0.0.0/8 rule on nsg-prod-app does not fire.
+references:
+  - https://attack.mitre.org/techniques/T1562/007/
+  - https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview

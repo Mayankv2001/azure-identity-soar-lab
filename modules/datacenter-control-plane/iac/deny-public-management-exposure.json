@@ -1,0 +1,57 @@
+{
+  "_comment": "Illustrative only - not deployment-ready. Azure Policy definition that denies NSG rules exposing management ports (SSH, RDP, WinRM) to the internet. This is the preventive control that pairs with detections CP-DET-006 and CP-DET-007.",
+  "properties": {
+    "displayName": "Deny public inbound on management ports",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Denies creation or update of NSG security rules that allow inbound traffic from the internet (0.0.0.0/0, *, Internet) to management ports 22, 3389, 5985 or 5986.",
+    "metadata": {
+      "category": "Network",
+      "version": "1.0.0"
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "Deny",
+        "allowedValues": ["Deny", "Audit", "Disabled"],
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Enable as Audit first, then tighten to Deny."
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Network/networkSecurityGroups/securityRules"
+          },
+          {
+            "field": "Microsoft.Network/networkSecurityGroups/securityRules/access",
+            "equals": "Allow"
+          },
+          {
+            "field": "Microsoft.Network/networkSecurityGroups/securityRules/direction",
+            "equals": "Inbound"
+          },
+          {
+            "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+            "in": ["0.0.0.0/0", "*", "Internet"]
+          },
+          {
+            "anyOf": [
+              {
+                "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRange",
+                "in": ["22", "3389", "5985", "5986"]
+              }
+            ]
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]"
+      }
+    }
+  }
+}

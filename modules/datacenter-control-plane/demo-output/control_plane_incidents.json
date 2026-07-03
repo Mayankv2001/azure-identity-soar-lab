@@ -1,0 +1,461 @@
+[
+  {
+    "incident_id": "CP-INC-2001",
+    "title": "Identity-to-control-plane attack chain - chris.walker@contoso.com",
+    "is_chain": true,
+    "chain_detection": "CP-DET-008",
+    "severity": "Critical",
+    "stages_observed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "entities": [
+      "/subscriptions/sub-prod-dc/resourceGroups/rg-prod-dc-mgmt",
+      "chris.walker@contoso.com",
+      "nsg-prod-dc-mgmt",
+      "rg-prod-dc-mgmt",
+      "sp-infra-deploy",
+      "vm-dc-mgmt-01"
+    ],
+    "alert_ids": [
+      "CP-AL-0001",
+      "CP-AL-0002",
+      "CP-AL-0003",
+      "CP-AL-0004",
+      "CP-AL-0005",
+      "CP-AL-0006",
+      "CP-AL-0007",
+      "CP-AL-0008"
+    ],
+    "alerts": [
+      {
+        "detection_id": "CP-DET-001",
+        "detection_name": "Risky sign-in from unusual location",
+        "severity": "High",
+        "stage": 1,
+        "mitre_tactics": [
+          "InitialAccess"
+        ],
+        "mitre_techniques": [
+          "T1078.004"
+        ],
+        "entity": "chris.walker@contoso.com",
+        "resources": [],
+        "window_start": "2026-06-30T09:00:00Z",
+        "window_end": "2026-06-30T09:00:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T09:00:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Azure CLI",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 0,
+            "MfaResult": null,
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "86dc1522-43d0-9980-d4d0-519025413b32",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0001"
+      },
+      {
+        "detection_id": "CP-DET-002",
+        "detection_name": "MFA fatigue leading to approval",
+        "severity": "Critical",
+        "stage": 2,
+        "mitre_tactics": [
+          "CredentialAccess"
+        ],
+        "mitre_techniques": [
+          "T1621"
+        ],
+        "entity": "chris.walker@contoso.com",
+        "resources": [],
+        "window_start": "2026-06-30T09:02:00Z",
+        "window_end": "2026-06-30T09:11:00Z",
+        "evidence_count": 6,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T09:02:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Microsoft 365",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 500121,
+            "MfaResult": "denied",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "3d43e654-7e1b-c7d6-4d6d-91184adcf92b",
+            "SimScenario": "control_plane_chain"
+          },
+          {
+            "TimeGenerated": "2026-06-30T09:03:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Azure CLI",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 500121,
+            "MfaResult": "denied",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "967003cf-7ad7-8e73-1811-ed7bf13f1abd",
+            "SimScenario": "control_plane_chain"
+          },
+          {
+            "TimeGenerated": "2026-06-30T09:05:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Azure CLI",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 500121,
+            "MfaResult": "denied",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "2c4d912a-4a0d-a81b-4770-91d811666b8f",
+            "SimScenario": "control_plane_chain"
+          },
+          {
+            "TimeGenerated": "2026-06-30T09:07:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Azure Portal",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 500121,
+            "MfaResult": "denied",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "6b45893b-950f-f203-4bbe-399ce8e0746e",
+            "SimScenario": "control_plane_chain"
+          },
+          {
+            "TimeGenerated": "2026-06-30T09:09:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Microsoft 365",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 500121,
+            "MfaResult": "denied",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "6c2083ca-9de1-f1fc-8663-6c2785711562",
+            "SimScenario": "control_plane_chain"
+          },
+          {
+            "TimeGenerated": "2026-06-30T09:11:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Azure CLI",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 0,
+            "MfaResult": "approved",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "cd4da55b-d232-6b65-e065-fc6c666aa18e",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0002"
+      },
+      {
+        "detection_id": "CP-DET-001",
+        "detection_name": "Risky sign-in from unusual location",
+        "severity": "High",
+        "stage": 1,
+        "mitre_tactics": [
+          "InitialAccess"
+        ],
+        "mitre_techniques": [
+          "T1078.004"
+        ],
+        "entity": "chris.walker@contoso.com",
+        "resources": [],
+        "window_start": "2026-06-30T09:11:00Z",
+        "window_end": "2026-06-30T09:11:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T09:11:00Z",
+            "UserPrincipalName": "chris.walker@contoso.com",
+            "AppDisplayName": "Azure CLI",
+            "IPAddress": "192.0.2.77",
+            "City": "Riga",
+            "Country": "LV",
+            "ResultType": 0,
+            "MfaResult": "approved",
+            "RiskLevelDuringSignIn": "high",
+            "CorrelationId": "cd4da55b-d232-6b65-e065-fc6c666aa18e",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0003"
+      },
+      {
+        "detection_id": "CP-DET-003",
+        "detection_name": "Privileged role activation without change record",
+        "severity": "High",
+        "stage": 3,
+        "mitre_tactics": [
+          "PrivilegeEscalation"
+        ],
+        "mitre_techniques": [
+          "T1098.003"
+        ],
+        "entity": "chris.walker@contoso.com",
+        "resources": [],
+        "window_start": "2026-06-30T09:25:00Z",
+        "window_end": "2026-06-30T09:25:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T09:25:00Z",
+            "OperationName": "Add member to role completed (PIM activation)",
+            "ActorUPN": "chris.walker@contoso.com",
+            "ActorIPAddress": "192.0.2.77",
+            "TargetName": "chris.walker@contoso.com",
+            "Detail": {
+              "role": "Application Administrator",
+              "change_ticket": null
+            },
+            "Result": "success",
+            "CorrelationId": "ce05cb84-70b8-8a5a-afe2-2dbf1a2a2ce7",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0004"
+      },
+      {
+        "detection_id": "CP-DET-004",
+        "detection_name": "Credential added to high-privilege service principal",
+        "severity": "Critical",
+        "stage": 4,
+        "mitre_tactics": [
+          "Persistence"
+        ],
+        "mitre_techniques": [
+          "T1098.001"
+        ],
+        "entity": "chris.walker@contoso.com",
+        "resources": [
+          "sp-infra-deploy"
+        ],
+        "window_start": "2026-06-30T09:40:00Z",
+        "window_end": "2026-06-30T09:40:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T09:40:00Z",
+            "OperationName": "Add service principal credentials",
+            "ActorUPN": "chris.walker@contoso.com",
+            "ActorIPAddress": "192.0.2.77",
+            "TargetName": "sp-infra-deploy",
+            "Detail": {
+              "key": "client secret added (expires 2028-06-30)",
+              "change_ticket": null
+            },
+            "Result": "success",
+            "CorrelationId": "790577fd-5b11-485a-8ab5-5c75dca1a392",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0005"
+      },
+      {
+        "detection_id": "CP-DET-005",
+        "detection_name": "Subscription or resource group permission change",
+        "severity": "High",
+        "stage": 5,
+        "mitre_tactics": [
+          "PrivilegeEscalation"
+        ],
+        "mitre_techniques": [
+          "T1098.003"
+        ],
+        "entity": "chris.walker@contoso.com",
+        "resources": [
+          "/subscriptions/sub-prod-dc/resourceGroups/rg-prod-dc-mgmt",
+          "sp-infra-deploy"
+        ],
+        "window_start": "2026-06-30T10:05:00Z",
+        "window_end": "2026-06-30T10:05:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T10:05:00Z",
+            "OperationNameValue": "Microsoft.Authorization/roleAssignments/write",
+            "Caller": "chris.walker@contoso.com",
+            "CallerIpAddress": "192.0.2.77",
+            "Scope": "/subscriptions/sub-prod-dc/resourceGroups/rg-prod-dc-mgmt",
+            "Properties": {
+              "principal": "sp-infra-deploy",
+              "role": "Owner",
+              "change_ticket": null
+            },
+            "ActivityStatusValue": "Success",
+            "CorrelationId": "e4c45522-61f8-1f9d-ea4a-88c47d79f3c4",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0006"
+      },
+      {
+        "detection_id": "CP-DET-006",
+        "detection_name": "NSG or firewall rule opened to the internet",
+        "severity": "Critical",
+        "stage": 6,
+        "mitre_tactics": [
+          "DefenseEvasion"
+        ],
+        "mitre_techniques": [
+          "T1562.007"
+        ],
+        "entity": "sp-infra-deploy",
+        "resources": [
+          "nsg-prod-dc-mgmt"
+        ],
+        "window_start": "2026-06-30T10:20:00Z",
+        "window_end": "2026-06-30T10:20:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T10:20:00Z",
+            "NsgName": "nsg-prod-dc-mgmt",
+            "RuleName": "allow-rdp-temp",
+            "Direction": "Inbound",
+            "Access": "Allow",
+            "Protocol": "TCP",
+            "DestinationPortRange": "3389",
+            "SourceAddressPrefix": "0.0.0.0/0",
+            "Actor": "sp-infra-deploy",
+            "ChangeTicket": null,
+            "CorrelationId": "c071d701-9c8f-aa94-6df9-dc5c8de048f6",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0007"
+      },
+      {
+        "detection_id": "CP-DET-007",
+        "detection_name": "VM management endpoint exposed to the internet",
+        "severity": "Critical",
+        "stage": 7,
+        "mitre_tactics": [
+          "InitialAccess"
+        ],
+        "mitre_techniques": [
+          "T1133"
+        ],
+        "entity": "sp-infra-deploy",
+        "resources": [
+          "vm-dc-mgmt-01"
+        ],
+        "window_start": "2026-06-30T10:20:00Z",
+        "window_end": "2026-06-30T10:20:00Z",
+        "evidence_count": 1,
+        "evidence": [
+          {
+            "TimeGenerated": "2026-06-30T10:20:00Z",
+            "NsgName": "nsg-prod-dc-mgmt",
+            "RuleName": "allow-rdp-temp",
+            "Direction": "Inbound",
+            "Access": "Allow",
+            "Protocol": "TCP",
+            "DestinationPortRange": "3389",
+            "SourceAddressPrefix": "0.0.0.0/0",
+            "Actor": "sp-infra-deploy",
+            "ChangeTicket": null,
+            "CorrelationId": "c071d701-9c8f-aa94-6df9-dc5c8de048f6",
+            "SimScenario": "control_plane_chain"
+          }
+        ],
+        "scenario_tags": [
+          "control_plane_chain"
+        ],
+        "alert_id": "CP-AL-0008"
+      }
+    ],
+    "defender_signals": [
+      {
+        "TimeGenerated": "2026-06-30T10:40:00Z",
+        "AlertName": "Traffic from unusual locations to a management port",
+        "Product": "Microsoft Defender for Cloud",
+        "Severity": "High",
+        "Entities": [
+          "vm-dc-mgmt-01",
+          "203.0.113.200"
+        ],
+        "Description": "Inbound RDP traffic from previously unseen source ranges was detected shortly after the management port became reachable from the internet.",
+        "SimScenario": "control_plane_chain"
+      }
+    ],
+    "mitre_techniques": [
+      "T1078.004",
+      "T1621",
+      "T1098.001",
+      "T1098.003",
+      "T1562.007",
+      "T1133"
+    ],
+    "window_start": "2026-06-30T09:00:00Z",
+    "window_end": "2026-06-30T10:20:00Z",
+    "blast_radius": {
+      "score": 100,
+      "label": "Critical",
+      "factors": [
+        {
+          "factor": "identity_privilege",
+          "points": 25,
+          "reason": "compromised identity holds or can activate privileged roles"
+        },
+        {
+          "factor": "service_principal_permissions",
+          "points": 25,
+          "reason": "high-privilege service principal in scope"
+        },
+        {
+          "factor": "public_exposure",
+          "points": 20,
+          "reason": "management surface reachable from the internet"
+        },
+        {
+          "factor": "asset_criticality",
+          "points": 20,
+          "reason": "critical datacenter-management assets in scope"
+        },
+        {
+          "factor": "affected_resources",
+          "points": 10,
+          "reason": "4 distinct resources affected"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,79 @@
+# Detection-as-code pipeline for the Datacenter Control Plane Attack Path Lab.
+#
+# Validate -> Test -> Package. The validate stage enforces that every detection
+# carries a MITRE mapping and response guidance, and that every SOAR playbook
+# action has an approval classification (automatic / human approval required /
+# manual only). The pipeline runs fully offline - no Azure subscription needed.
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - modules/datacenter-control-plane/*
+      - .azure-pipelines/validate-control-plane-module.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - modules/datacenter-control-plane/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  pythonVersion: "3.12"
+  moduleRoot: modules/datacenter-control-plane
+
+stages:
+  - stage: Validate
+    displayName: Validate control-plane detection-as-code
+    jobs:
+      - job: validate
+        displayName: MITRE mapping and approval classification checks
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $(pythonVersion)
+          - script: python -m pip install --upgrade pip && pip install -r requirements.txt
+            displayName: Install dependencies
+          - script: python $(moduleRoot)/src/validate_module.py
+            displayName: Every detection has MITRE + response guidance; every playbook action classified
+
+  - stage: Test
+    displayName: Detection and correlation tests
+    dependsOn: Validate
+    jobs:
+      - job: pytest
+        displayName: Module test suite plus demo smoke run
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: $(pythonVersion)
+          - script: python -m pip install --upgrade pip && pip install -r requirements.txt
+            displayName: Install dependencies
+          - script: python -m pytest $(moduleRoot)/tests -v
+            displayName: Run module tests
+          - script: python $(moduleRoot)/src/main.py --demo
+            displayName: Generate demo outputs (end-to-end smoke run)
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: $(moduleRoot)/demo-output
+              artifactName: control-plane-demo-output
+            displayName: Publish demo output as build artifact
+
+  - stage: Package
+    displayName: Package control-plane detections
+    dependsOn: Test
+    jobs:
+      - job: package
+        steps:
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: $(moduleRoot)/detections
+              artifactName: control-plane-detections
+            displayName: Publish detection rules artifact

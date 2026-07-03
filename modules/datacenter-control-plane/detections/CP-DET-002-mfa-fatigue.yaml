@@ -1,0 +1,29 @@
+id: CP-DET-002
+title: MFA fatigue leading to approval
+description: >-
+  Five or more failed strong-authentication events for one user within ten
+  minutes, followed by an approved MFA sign-in within 30 minutes. The approval
+  after the deny burst is the account-takeover moment and requires the attacker
+  to already hold a valid password.
+severity: Critical
+data_source: SigninLogs
+tactics:
+  - CredentialAccess
+techniques:
+  - T1621
+false_positive_guidance: >-
+  Users repeatedly re-triggering prompts during device or authenticator
+  re-enrolment, or helpdesk-driven MFA resets. The requirement for a subsequent
+  approval sharply reduces benign firings.
+response_guidance: >-
+  Revoke sessions and refresh tokens immediately, reset credentials, re-register
+  MFA and remove attacker-enrolled methods. Move the user to phishing-resistant
+  MFA. Escalate as chain stage 2.
+owner: Identity Detection Engineering
+version: 1.0.0
+local_detection: detect_mfa_fatigue
+test_expectation: >-
+  Fires for chris.walker@contoso.com (five denials then an approval from the
+  attacker IP); benign single missed prompts do not fire.
+references:
+  - https://attack.mitre.org/techniques/T1621/

@@ -1,0 +1,4 @@
+[
+{"TimeGenerated": "2026-06-29T03:30:00Z", "NsgName": "nsg-prod-app", "RuleName": "allow-https-internal", "Direction": "Inbound", "Access": "Allow", "Protocol": "TCP", "DestinationPortRange": "443", "SourceAddressPrefix": "10.0.0.0/8", "Actor": "felix.nguyen@contoso.com", "ChangeTicket": "CHG778190", "CorrelationId": "cbe2df4f-5ac9-5568-4114-520836938222", "SimScenario": "benign"},
+{"TimeGenerated": "2026-06-30T10:20:00Z", "NsgName": "nsg-prod-dc-mgmt", "RuleName": "allow-rdp-temp", "Direction": "Inbound", "Access": "Allow", "Protocol": "TCP", "DestinationPortRange": "3389", "SourceAddressPrefix": "0.0.0.0/0", "Actor": "sp-infra-deploy", "ChangeTicket": null, "CorrelationId": "c071d701-9c8f-aa94-6df9-dc5c8de048f6", "SimScenario": "control_plane_chain"}
+]

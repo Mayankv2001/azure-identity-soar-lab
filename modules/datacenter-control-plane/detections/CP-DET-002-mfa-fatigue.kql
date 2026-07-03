@@ -1,0 +1,25 @@
+// CP-DET-002 | MFA fatigue leading to approval | v1.0.0
+// Tactic: Credential Access | Technique: T1621 (Multi-Factor Authentication Request Generation)
+//
+// Five or more failed strong-auth events (ResultType 500121) for one user
+// within ten minutes, followed by an MFA-approved success within 30 minutes -
+// the takeover moment. Mirrors detect_mfa_fatigue in ../src/correlation_engine.py.
+let burst_threshold = 5;
+let denies =
+    SigninLogs
+    | where TimeGenerated > ago(1h)
+    | where ResultType == 500121
+    | project TimeGenerated, UserPrincipalName, IPAddress;
+denies
+| summarize DenyCount = count(), LastDeny = max(TimeGenerated),
+            SourceIPs = make_set(IPAddress, 10)
+    by UserPrincipalName, Window = bin(TimeGenerated, 10m)
+| where DenyCount >= burst_threshold
+| join kind=inner (
+    SigninLogs
+    | where ResultType == 0 and AuthenticationRequirement == "multiFactorAuthentication"
+    | project UserPrincipalName, ApprovedAt = TimeGenerated
+) on UserPrincipalName
+| where ApprovedAt between (LastDeny .. (LastDeny + 30m))
+| project LastDeny, ApprovedAt, UserPrincipalName, DenyCount, SourceIPs
+| sort by LastDeny asc

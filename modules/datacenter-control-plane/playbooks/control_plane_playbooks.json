@@ -1,0 +1,161 @@
+{
+  "description": "SOAR playbook outlines for the datacenter control-plane chain. Each action is classified: automatic, human approval required, or manual only. Ordered least-destructive first. AI output is advisory only and never triggers an action.",
+  "approval_classes": ["automatic", "human approval required", "manual only"],
+  "playbooks": [
+    {
+      "playbook_id": "CP-PB-01",
+      "display_name": "notify-dri-oncall",
+      "purpose": "Page the on-call DRI when a control-plane chain incident is raised.",
+      "automation_level": "automatic",
+      "trigger": "CP-DET-008 correlated chain incident created",
+      "used_by_detections": ["CP-DET-008"],
+      "actions": [
+        {"step": 1, "action": "compose_blast_radius_card", "connector": "Data Operations"},
+        {"step": 2, "action": "post_to_soc_channel", "connector": "Microsoft Teams"},
+        {"step": 3, "action": "page_primary_dri", "connector": "HTTP (PagerDuty/Opsgenie)"}
+      ],
+      "rollback": "Informational only."
+    },
+    {
+      "playbook_id": "CP-PB-02",
+      "display_name": "open-incident-ticket",
+      "purpose": "Create an auditable work item with SLA timers.",
+      "automation_level": "automatic",
+      "trigger": "Any control-plane incident created",
+      "used_by_detections": ["CP-DET-001", "CP-DET-002", "CP-DET-003", "CP-DET-004", "CP-DET-005", "CP-DET-006", "CP-DET-007", "CP-DET-008"],
+      "actions": [
+        {"step": 1, "action": "create_ticket", "connector": "HTTP (ServiceNow-style)"},
+        {"step": 2, "action": "write_ticket_id_to_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Close ticket as opened-in-error."
+    },
+    {
+      "playbook_id": "CP-PB-03",
+      "display_name": "enrich-alert",
+      "purpose": "Attach identity privilege, SP permissions, asset criticality and public-exposure context; compute blast radius.",
+      "automation_level": "automatic",
+      "trigger": "Any control-plane incident created",
+      "used_by_detections": ["CP-DET-008"],
+      "actions": [
+        {"step": 1, "action": "lookup_identity_and_pim", "connector": "HTTP (Graph API)"},
+        {"step": 2, "action": "lookup_service_principal_rbac", "connector": "HTTP (Graph/ARM)"},
+        {"step": 3, "action": "lookup_asset_criticality", "connector": "HTTP (asset inventory)"},
+        {"step": 4, "action": "check_current_public_exposure", "connector": "HTTP (ARM)"},
+        {"step": 5, "action": "attach_blast_radius", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Informational only."
+    },
+    {
+      "playbook_id": "CP-PB-04",
+      "display_name": "revoke-sessions",
+      "purpose": "Invalidate refresh tokens and sessions for the compromised identity.",
+      "automation_level": "automatic",
+      "trigger": "Chain confirmed at Critical (CP-DET-002 present)",
+      "used_by_detections": ["CP-DET-001", "CP-DET-002"],
+      "actions": [
+        {"step": 1, "action": "revoke_sign_in_sessions", "connector": "Microsoft Entra ID"},
+        {"step": 2, "action": "confirm_user_compromised", "connector": "Microsoft Entra ID Protection"},
+        {"step": 3, "action": "comment_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "None needed - legitimate user re-authenticates with MFA."
+    },
+    {
+      "playbook_id": "CP-PB-05",
+      "display_name": "revert-nsg-firewall-rule",
+      "purpose": "Restore the NSG rule that exposed the management port to the internet.",
+      "automation_level": "human approval required",
+      "approver_role": "SOC DRI + network on-call",
+      "trigger": "CP-DET-006 or CP-DET-007",
+      "used_by_detections": ["CP-DET-006", "CP-DET-007"],
+      "actions": [
+        {"step": 1, "action": "snapshot_current_rule", "connector": "HTTP (ARM)"},
+        {"step": 2, "action": "approval_gate", "connector": "Microsoft Teams", "human_approval": true},
+        {"step": 3, "action": "revert_or_delete_rule", "connector": "HTTP (ARM)"},
+        {"step": 4, "action": "comment_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Re-apply the snapshotted rule if the change was legitimate."
+    },
+    {
+      "playbook_id": "CP-PB-06",
+      "display_name": "rotate-service-principal-credential",
+      "purpose": "Remove the attacker-added credential and rotate remaining secrets on the SP.",
+      "automation_level": "human approval required",
+      "approver_role": "SOC DRI + application owner",
+      "trigger": "CP-DET-004",
+      "used_by_detections": ["CP-DET-004"],
+      "actions": [
+        {"step": 1, "action": "identify_added_credential", "connector": "HTTP (Graph API)"},
+        {"step": 2, "action": "approval_gate", "connector": "Microsoft Teams", "human_approval": true},
+        {"step": 3, "action": "remove_attacker_credential", "connector": "HTTP (Graph API)"},
+        {"step": 4, "action": "rotate_remaining_credentials", "connector": "HTTP (Graph API)"},
+        {"step": 5, "action": "comment_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Application owner re-issues a legitimate credential; integrations updated from key vault."
+    },
+    {
+      "playbook_id": "CP-PB-07",
+      "display_name": "remove-privileged-role-assignment",
+      "purpose": "Deactivate the PIM role or remove the RBAC assignment used to escalate.",
+      "automation_level": "human approval required",
+      "approver_role": "SOC DRI",
+      "trigger": "CP-DET-003 or CP-DET-005",
+      "used_by_detections": ["CP-DET-003", "CP-DET-005"],
+      "actions": [
+        {"step": 1, "action": "list_recent_assignments", "connector": "HTTP (Graph/ARM)"},
+        {"step": 2, "action": "approval_gate", "connector": "Microsoft Teams", "human_approval": true},
+        {"step": 3, "action": "deactivate_or_remove_assignment", "connector": "HTTP (Graph/ARM)"},
+        {"step": 4, "action": "comment_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Re-grant via the standard PIM/access-request process if legitimate."
+    },
+    {
+      "playbook_id": "CP-PB-08",
+      "display_name": "isolate-vm-restrict-management-endpoint",
+      "purpose": "Restrict the exposed management endpoint (JIT/Bastion) or isolate the VM.",
+      "automation_level": "human approval required",
+      "approver_role": "SOC DRI + workload owner",
+      "trigger": "CP-DET-007 with signs of inbound access",
+      "used_by_detections": ["CP-DET-007"],
+      "actions": [
+        {"step": 1, "action": "assess_inbound_activity", "connector": "HTTP (Defender for Cloud)"},
+        {"step": 2, "action": "approval_gate", "connector": "Microsoft Teams", "human_approval": true},
+        {"step": 3, "action": "apply_jit_or_deny_rule", "connector": "HTTP (ARM)"},
+        {"step": 4, "action": "isolate_vm_if_compromised", "connector": "HTTP (ARM)"},
+        {"step": 5, "action": "comment_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Restore normal network config once the VM is confirmed clean."
+    },
+    {
+      "playbook_id": "CP-PB-09",
+      "display_name": "disable-or-contain-user",
+      "purpose": "Full account containment when takeover is confirmed - highest blast radius.",
+      "automation_level": "human approval required",
+      "approver_role": "SOC DRI (manager notified)",
+      "trigger": "Chain confirmed, identity compromise verified",
+      "used_by_detections": ["CP-DET-002", "CP-DET-003", "CP-DET-004", "CP-DET-008"],
+      "actions": [
+        {"step": 1, "action": "gather_business_impact_context", "connector": "Microsoft Sentinel"},
+        {"step": 2, "action": "approval_gate", "connector": "Microsoft Teams", "human_approval": true},
+        {"step": 3, "action": "disable_account", "connector": "Microsoft Entra ID"},
+        {"step": 4, "action": "notify_manager", "connector": "Office 365 Outlook"},
+        {"step": 5, "action": "comment_incident", "connector": "Microsoft Sentinel"}
+      ],
+      "rollback": "Re-enable the account after eviction is confirmed."
+    },
+    {
+      "playbook_id": "CP-PB-10",
+      "display_name": "create-rca-task",
+      "purpose": "Open a blameless RCA task feeding detection and policy tuning.",
+      "automation_level": "manual only",
+      "approver_role": "Incident DRI (author)",
+      "trigger": "Incident resolved",
+      "used_by_detections": ["CP-DET-008"],
+      "actions": [
+        {"step": 1, "action": "create_rca_work_item", "connector": "HTTP (Azure DevOps Boards)"},
+        {"step": 2, "action": "attach_timeline_and_blast_radius", "connector": "Data Operations"},
+        {"step": 3, "action": "link_hardening_actions", "connector": "HTTP (Azure DevOps Boards)"}
+      ],
+      "rollback": "Not applicable - documentation artefact."
+    }
+  ]
+}

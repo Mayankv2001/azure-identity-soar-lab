@@ -1,0 +1,4 @@
+[
+{"TimeGenerated": "2026-06-28T04:15:00Z", "AlertName": "Antimalware signature update completed", "Product": "Microsoft Defender for Cloud", "Severity": "Informational", "Entities": ["vm-app-01"], "Description": "Routine platform hygiene event included as benign noise.", "SimScenario": "benign"},
+{"TimeGenerated": "2026-06-30T10:40:00Z", "AlertName": "Traffic from unusual locations to a management port", "Product": "Microsoft Defender for Cloud", "Severity": "High", "Entities": ["vm-dc-mgmt-01", "203.0.113.200"], "Description": "Inbound RDP traffic from previously unseen source ranges was detected shortly after the management port became reachable from the internet.", "SimScenario": "control_plane_chain"}
+]

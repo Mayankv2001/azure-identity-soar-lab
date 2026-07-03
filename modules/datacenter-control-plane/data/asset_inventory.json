@@ -1,0 +1,10 @@
+[
+{"asset_id": "sub-prod-dc", "type": "subscription", "name": "Production - Datacenter Operations", "criticality": "high", "owner_team": "Cloud Operations"},
+{"asset_id": "rg-prod-dc-mgmt", "type": "resource_group", "name": "rg-prod-dc-mgmt", "subscription": "sub-prod-dc", "criticality": "critical", "purpose": "Datacenter management tooling", "owner_team": "Cloud Operations"},
+{"asset_id": "vm-dc-mgmt-01", "type": "virtual_machine", "name": "vm-dc-mgmt-01", "resource_group": "rg-prod-dc-mgmt", "criticality": "critical", "purpose": "Management jumpbox", "public_ip": "203.0.113.200", "nsg": "nsg-prod-dc-mgmt", "management_ports": [3389]},
+{"asset_id": "vm-app-01", "type": "virtual_machine", "name": "vm-app-01", "resource_group": "rg-prod-app", "criticality": "medium", "purpose": "Application server", "public_ip": null, "nsg": "nsg-prod-app", "management_ports": [22]},
+{"asset_id": "nsg-prod-dc-mgmt", "type": "network_security_group", "name": "nsg-prod-dc-mgmt", "resource_group": "rg-prod-dc-mgmt", "criticality": "critical", "protects": ["vm-dc-mgmt-01"]},
+{"asset_id": "nsg-prod-app", "type": "network_security_group", "name": "nsg-prod-app", "resource_group": "rg-prod-app", "criticality": "medium", "protects": ["vm-app-01"]},
+{"asset_id": "sp-infra-deploy", "type": "service_principal", "name": "sp-infra-deploy", "privilege_tier": "high", "azure_rbac": [{"role": "Contributor", "scope": "/subscriptions/sub-prod-dc"}], "owner_upn": "chris.walker@contoso.com", "purpose": "Infrastructure deployment automation"},
+{"asset_id": "sp-monitoring-reader", "type": "service_principal", "name": "sp-monitoring-reader", "privilege_tier": "low", "azure_rbac": [{"role": "Monitoring Reader", "scope": "/subscriptions/sub-prod-dc"}], "owner_upn": "dana.iyer@contoso.com", "purpose": "Read-only monitoring exports"}
+]

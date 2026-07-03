@@ -1,0 +1,29 @@
+id: CP-DET-001
+title: Risky sign-in from unusual location
+description: >-
+  Successful high-risk sign-in from a country that is not the user's usual
+  country. In the control-plane chain this is the initial foothold before MFA
+  fatigue and privilege escalation.
+severity: High
+data_source: SigninLogs
+tactics:
+  - InitialAccess
+techniques:
+  - T1078.004
+false_positive_guidance: >-
+  Legitimate travel, VPN or SASE egress geolocating to another country, and
+  new-device sign-ins. Correlate with device compliance and the user's travel
+  calendar before treating as malicious.
+response_guidance: >-
+  Confirm the sign-in with the user out-of-band. If unexplained, revoke sessions
+  and treat as the first stage of a potential chain - pivot to audit and
+  activity logs for the same identity within the next four hours.
+owner: Identity Detection Engineering
+version: 1.0.0
+local_detection: detect_risky_signin
+test_expectation: >-
+  Fires for chris.walker@contoso.com signing in from LV (unusual country) with
+  high risk; does not fire for baseline AU sign-ins.
+references:
+  - https://attack.mitre.org/techniques/T1078/004/
+  - https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks

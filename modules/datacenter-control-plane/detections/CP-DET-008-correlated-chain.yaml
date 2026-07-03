@@ -1,0 +1,42 @@
+id: CP-DET-008
+title: Correlated identity-to-control-plane attack chain
+description: >-
+  Meta-detection that links the individual control-plane detections sharing an
+  identity, service principal or resource scope within a four-hour window. When
+  three or more distinct attack stages are present it raises one Critical
+  incident with a blast-radius score, rather than leaving eight disconnected
+  alerts for an analyst to reassemble. This is the detection that turns signals
+  into a story.
+severity: Critical
+data_source: Correlation (SecurityAlert / control-plane detections)
+tactics:
+  - InitialAccess
+  - CredentialAccess
+  - PrivilegeEscalation
+  - Persistence
+  - DefenseEvasion
+techniques:
+  - T1078.004
+  - T1621
+  - T1098.001
+  - T1098.003
+  - T1562.007
+  - T1133
+false_positive_guidance: >-
+  Because it requires three or more distinct stages within a tight window on a
+  shared entity, benign firings are rare. The main risk is over-merging on
+  shared service accounts; scope the correlation key accordingly.
+response_guidance: >-
+  Treat as a single high-severity incident. Enrich all entities, present the
+  blast-radius score to the DRI, and drive least-destructive approved
+  containment across the whole chain before writing the RCA. Chain stage 8.
+owner: Cloud Security Engineering
+version: 1.0.0
+local_detection: correlate
+test_expectation: >-
+  Produces exactly one Critical chain incident spanning stages 1-7 for the
+  chris.walker / sp-infra-deploy / rg-prod-dc-mgmt entities, with a blast-radius
+  score of at least 80.
+references:
+  - https://learn.microsoft.com/en-us/azure/sentinel/fusion
+  - https://learn.microsoft.com/en-us/azure/sentinel/detect-threats-custom

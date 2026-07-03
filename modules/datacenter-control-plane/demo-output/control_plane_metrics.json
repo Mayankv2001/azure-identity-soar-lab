@@ -1,0 +1,40 @@
+{
+  "reporting_window": "2026-06-27 to 2026-06-30 (simulation clock 2026-07-01T00:00Z)",
+  "telemetry_events": {
+    "signin": 46,
+    "audit": 4,
+    "activity": 4,
+    "nsg": 2,
+    "defender": 2
+  },
+  "alert_count": 8,
+  "alerts_by_detection": {
+    "CP-DET-001": 2,
+    "CP-DET-002": 1,
+    "CP-DET-003": 1,
+    "CP-DET-004": 1,
+    "CP-DET-005": 1,
+    "CP-DET-006": 1,
+    "CP-DET-007": 1
+  },
+  "incident_count": 1,
+  "correlated_chain_incidents": 1,
+  "max_blast_radius": 100,
+  "chain_stages_detected": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "mitre_techniques_covered": [
+    "T1078.004",
+    "T1098.001",
+    "T1098.003",
+    "T1133",
+    "T1562.007",
+    "T1621"
+  ]
+}

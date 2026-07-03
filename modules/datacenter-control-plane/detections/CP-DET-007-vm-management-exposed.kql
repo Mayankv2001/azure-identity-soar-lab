@@ -1,0 +1,25 @@
+// CP-DET-007 | VM management endpoint exposed to the internet | v1.0.0
+// Tactic: Initial Access | Technique: T1133 (External Remote Services)
+//
+// An internet-open NSG allow rule on a management port (22, 3389, 5985, 5986)
+// where the protected VM actually has a public IP - so the management endpoint
+// is genuinely reachable, not merely permitted.
+// Mirrors detect_mgmt_endpoint_exposed in ../src/correlation_engine.py.
+let management_ports = dynamic(["22", "3389", "5985", "5986"]);
+let public_vms =
+    _GetWatchlist('AssetInventory')
+    | where tostring(Type) == "virtual_machine" and isnotempty(PublicIp)
+    | project Nsg = tostring(Nsg), Vm = tostring(Name);
+AzureActivity
+| where TimeGenerated > ago(1d)
+| where OperationNameValue == "Microsoft.Network/networkSecurityGroups/securityRules/write"
+| extend SourcePrefix = tostring(Properties.sourceAddressPrefix),
+         Access = tostring(Properties.access),
+         Port = tostring(Properties.destinationPortRange),
+         Nsg = tostring(Properties.nsgName)
+| where Access == "Allow"
+| where SourcePrefix in ("0.0.0.0/0", "*", "Internet")
+| where Port in (management_ports)
+| join kind=inner public_vms on Nsg
+| project TimeGenerated, Caller, Nsg, Vm, Port, SourcePrefix
+| sort by TimeGenerated asc

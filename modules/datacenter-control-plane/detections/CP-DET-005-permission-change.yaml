@@ -1,0 +1,30 @@
+id: CP-DET-005
+title: Subscription or resource group permission change
+description: >-
+  A role assignment written at subscription or resource group scope with no
+  linked change record. Granting Owner or Contributor to a service principal on
+  a critical resource group is a control-plane escalation that widens blast
+  radius significantly.
+severity: High
+data_source: AzureActivity
+tactics:
+  - PrivilegeEscalation
+techniques:
+  - T1098.003
+false_positive_guidance: >-
+  Legitimate landing-zone automation and onboarding of new workloads. Require
+  change references on role-assignment writes and exclude approved platform
+  automation identities.
+response_guidance: >-
+  Validate against an approved access request. If unauthorised, remove the role
+  assignment, review what the principal did with it, and treat the caller as
+  compromised. Chain stage 5.
+owner: Cloud Security Engineering
+version: 1.0.0
+local_detection: detect_permission_change
+test_expectation: >-
+  Fires for the ticketless Owner grant to sp-infra-deploy on rg-prod-dc-mgmt;
+  the ticketed benign deployment does not fire.
+references:
+  - https://attack.mitre.org/techniques/T1098/003/
+  - https://learn.microsoft.com/en-us/azure/role-based-access-control/overview

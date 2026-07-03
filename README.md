@@ -282,6 +282,41 @@ onboarding, data connectors (Entra ID sign-in/audit, CyberArk via AMA or the
 Logs Ingestion API), watchlists, then analytics rules via the pipeline's deploy
 stage and playbooks as Logic Apps.
 
+## Advanced extension: Datacenter Control Plane Attack Path Lab
+
+A second module, [modules/datacenter-control-plane/](modules/datacenter-control-plane/),
+follows the attacker past the identity plane and into Azure infrastructure -
+the seam a Microsoft CO+I Cloud Security Engineer actually works.
+
+**What it demonstrates:** one correlated attack chain from a risky sign-in ->
+MFA fatigue -> ticketless privileged-role activation -> credential added to a
+high-privilege service principal -> Owner granted on a datacenter-management
+resource group -> an NSG rule opening RDP to `0.0.0.0/0` on a reachable
+management jumpbox. Eight KQL-mirrored detections across Entra ID, Azure
+Activity and Defender telemetry are correlated by identity, service principal
+and resource scope into **one Critical incident with an explainable
+blast-radius score (100/100)**, followed by approval-gated containment and an
+RCA that recommends the Azure Policy which would have prevented the exposure.
+
+**Why it matters for Microsoft CO+I:** the role is cloud security engineering,
+not alert-watching. This module shows identity-to-cloud attack-path thinking,
+detection engineering as code, Azure networking/RBAC/NSG reasoning, IaC
+(Bicep + Azure Policy), and SOAR with strict automate-vs-approve boundaries for
+destructive network changes - the exact breadth the hiring manager described.
+
+**How to run it:**
+
+```bash
+python3 modules/datacenter-control-plane/src/main.py --demo
+```
+
+**In an interview, open:**
+[modules/datacenter-control-plane/demo-output/control_plane_timeline.md](modules/datacenter-control-plane/demo-output/control_plane_timeline.md)
+- the full chain chronologically with the blast-radius breakdown and response
+flow. Talk track:
+[docs/DATACENTER_CONTROL_PLANE_TALK_TRACK.md](docs/DATACENTER_CONTROL_PLANE_TALK_TRACK.md).
+Full detail: [module README](modules/datacenter-control-plane/README.md).
+
 ## License
 
 MIT - see [LICENSE](LICENSE).

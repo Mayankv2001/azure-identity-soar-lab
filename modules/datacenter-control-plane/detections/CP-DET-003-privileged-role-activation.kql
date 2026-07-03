@@ -1,0 +1,17 @@
+// CP-DET-003 | Privileged role activation without change record | v1.0.0
+// Tactic: Privilege Escalation | Technique: T1098.003 (Account Manipulation: Additional Cloud Roles)
+//
+// Activation or addition of a protected directory role with no linked change
+// ticket. Mirrors detect_priv_role_activation in ../src/correlation_engine.py.
+let protected_roles = dynamic(["Global Administrator", "Privileged Role Administrator",
+                               "Application Administrator"]);
+AuditLogs
+| where TimeGenerated > ago(1d)
+| where OperationName startswith "Add member to role"
+| extend ActorUPN = tostring(InitiatedBy.user.userPrincipalName),
+         Role = tostring(TargetResources[0].displayName),
+         ChangeTicket = tostring(AdditionalDetails[0].value)
+| where Role in (protected_roles)
+| where isempty(ChangeTicket)
+| project TimeGenerated, ActorUPN, Role, ChangeTicket
+| sort by TimeGenerated asc

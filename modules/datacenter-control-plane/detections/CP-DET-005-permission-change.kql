@@ -1,0 +1,17 @@
+// CP-DET-005 | Subscription or resource group permission change | v1.0.0
+// Tactic: Privilege Escalation | Technique: T1098.003 (Account Manipulation: Additional Cloud Roles)
+//
+// A role assignment written at subscription or resource group scope with no
+// linked change record - especially granting Owner/Contributor to a service
+// principal. Mirrors detect_permission_change in ../src/correlation_engine.py.
+AzureActivity
+| where TimeGenerated > ago(1d)
+| where OperationNameValue == "Microsoft.Authorization/roleAssignments/write"
+| where ActivityStatusValue == "Success"
+| extend ChangeTicket = tostring(Properties.change_ticket),
+         GrantedRole = tostring(Properties.role),
+         Principal = tostring(Properties.principal)
+| where isempty(ChangeTicket)
+| project TimeGenerated, Caller, CallerIpAddress, Scope = _ResourceId,
+          GrantedRole, Principal
+| sort by TimeGenerated asc

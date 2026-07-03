@@ -1,0 +1,30 @@
+id: CP-DET-007
+title: VM management endpoint exposed to the internet
+description: >-
+  An internet-open NSG allow rule on a management port (SSH, RDP, WinRM) where
+  the protected virtual machine actually has a public IP, so the management
+  endpoint is genuinely reachable. This is the point at which a control-plane
+  change becomes a data-plane exposure an attacker can log in through.
+severity: Critical
+data_source: AzureActivity
+tactics:
+  - InitialAccess
+techniques:
+  - T1133
+false_positive_guidance: >-
+  Deliberate bastion or jump-host exposure protected by just-in-time access.
+  Prefer Azure Bastion and JIT VM access; genuine public management endpoints
+  should be rare and tagged.
+response_guidance: >-
+  Treat as an active exposure: revert the NSG rule, enable JIT/Bastion, check
+  Defender for Cloud for inbound attempts on the port, and isolate the VM if
+  compromise is suspected. Chain stage 7.
+owner: Cloud Security Engineering
+version: 1.0.0
+local_detection: detect_mgmt_endpoint_exposed
+test_expectation: >-
+  Fires for the RDP exposure of vm-dc-mgmt-01 (has a public IP); would not fire
+  if the VM had no public IP even with the rule present.
+references:
+  - https://attack.mitre.org/techniques/T1133/
+  - https://learn.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-overview

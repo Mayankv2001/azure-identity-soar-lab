@@ -1,0 +1,18 @@
+// CP-DET-006 | NSG or firewall rule opened to the internet | v1.0.0
+// Tactic: Defense Evasion | Technique: T1562.007 (Impair Defenses: Disable or Modify Cloud Firewall)
+//
+// An inbound allow rule created or updated with an internet-wide source prefix
+// (0.0.0.0/0, *, Internet). Internal source ranges never alert.
+// Mirrors detect_nsg_public_rule in ../src/correlation_engine.py.
+AzureActivity
+| where TimeGenerated > ago(1d)
+| where OperationNameValue == "Microsoft.Network/networkSecurityGroups/securityRules/write"
+| where ActivityStatusValue == "Success"
+| extend SourcePrefix = tostring(Properties.sourceAddressPrefix),
+         Access = tostring(Properties.access),
+         RuleName = tostring(Properties.rule)
+| where Access == "Allow"
+| where SourcePrefix in ("0.0.0.0/0", "*", "Internet")
+| project TimeGenerated, Caller, CallerIpAddress, Scope = _ResourceId,
+          RuleName, SourcePrefix
+| sort by TimeGenerated asc

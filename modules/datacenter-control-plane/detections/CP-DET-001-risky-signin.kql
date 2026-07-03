@@ -1,0 +1,19 @@
+// CP-DET-001 | Risky sign-in from unusual location | v1.0.0
+// Tactic: Initial Access | Technique: T1078.004 (Valid Accounts: Cloud Accounts)
+//
+// Successful, high-risk sign-in from a country that is not the user's usual
+// country. This is the entry point of the control-plane attack chain.
+// Mirrors detect_risky_signin in ../src/correlation_engine.py.
+let known_country =
+    _GetWatchlist('IdentityBaseline')
+    | project UserPrincipalName = tostring(SearchKey), UsualCountry = tostring(Country);
+SigninLogs
+| where TimeGenerated > ago(1d)
+| where ResultType == 0
+| where RiskLevelDuringSignIn == "high"
+| extend Country = tostring(LocationDetails.countryOrRegion)
+| join kind=leftouter known_country on UserPrincipalName
+| where isempty(UsualCountry) or Country != UsualCountry
+| project TimeGenerated, UserPrincipalName, Country, IPAddress,
+          AppDisplayName, RiskLevelDuringSignIn
+| sort by TimeGenerated asc

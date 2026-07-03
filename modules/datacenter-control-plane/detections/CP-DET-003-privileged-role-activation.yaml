@@ -1,0 +1,30 @@
+id: CP-DET-003
+title: Privileged role activation without change record
+description: >-
+  Activation or direct addition of a protected Microsoft Entra ID role
+  (Global Administrator, Privileged Role Administrator, Application
+  Administrator) with no linked change ticket. In a PIM-governed environment,
+  activation without justification is a strong escalation signal.
+severity: High
+data_source: AuditLogs
+tactics:
+  - PrivilegeEscalation
+techniques:
+  - T1098.003
+false_positive_guidance: >-
+  Break-glass activations and approved emergency changes. Reduce noise by
+  binding PIM activation to a change/ticket reference and excluding documented
+  break-glass identities.
+response_guidance: >-
+  Verify the activation against an approved request. If none exists, deactivate
+  the role, review every action taken while elevated, and treat the actor as
+  compromised. Chain stage 3.
+owner: Identity Detection Engineering
+version: 1.0.0
+local_detection: detect_priv_role_activation
+test_expectation: >-
+  Fires for the ticketless Application Administrator activation by
+  chris.walker@contoso.com; a ticketed activation would not fire.
+references:
+  - https://attack.mitre.org/techniques/T1098/003/
+  - https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure
