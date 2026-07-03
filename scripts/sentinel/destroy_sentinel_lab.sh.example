@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# ============================================================================
+# EXAMPLE ONLY - lab teardown. This file does not run a destroy by itself.
+# ============================================================================
+#
+# !!  DESTRUCTIVE  !!  Deleting a resource group deletes EVERYTHING in it,
+# permanently. Only run the delete command below if the resource group contains
+# ONLY your lab resources and nothing you want to keep.
+#
+# There is no example .sh (non-.example) destroy script on purpose: deleting
+# resources should be a deliberate, manually-typed action.
+#
+# To tear down the lab:
+#
+#   1. Confirm you are in the right subscription:
+#        az account show --query "{subscription:name, id:id}" -o table
+#
+#   2. Confirm what is in the resource group before deleting:
+#        export RESOURCE_GROUP="rg-sentinel-identity-lab"
+#        az resource list --resource-group "$RESOURCE_GROUP" -o table
+#
+#   3. Delete the resource group (this removes the workspace, Sentinel, rules):
+#        az group delete --name "$RESOURCE_GROUP" --yes --no-wait
+#
+#   4. (Optional) Verify deletion started:
+#        az group show --name "$RESOURCE_GROUP" -o table   # should error once gone
+#
+# NOTE: Log Analytics workspaces have a soft-delete window; a workspace of the
+# same name may be recoverable/re-provisionable for a period after deletion.
+echo "This is an EXAMPLE file. Read it, confirm the resource group, then run the delete command yourself."

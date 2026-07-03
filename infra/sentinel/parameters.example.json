@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "_comment": "Example parameters for the LAB-ONLY Sentinel deployment. Copy to parameters.json, replace the placeholders, and never commit real values. No subscription IDs or tenant IDs belong in this file.",
+  "parameters": {
+    "location": {
+      "value": "<location>"
+    },
+    "workspaceName": {
+      "value": "<workspace-name>"
+    },
+    "environmentName": {
+      "value": "<environment-name>"
+    },
+    "retentionInDays": {
+      "value": 30
+    },
+    "deployAnalyticsRules": {
+      "value": true
+    },
+    "enableAnalyticsRule": {
+      "value": false
+    },
+    "deployAutomationRules": {
+      "value": false
+    },
+    "deployPlaybook": {
+      "value": false
+    },
+    "tags": {
+      "value": {
+        "project": "azure-identity-soar-lab",
+        "mode": "lab-only",
+        "environment": "lab"
+      }
+    }
+  }
+}

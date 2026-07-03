@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# EXAMPLE ONLY - shows how to set the environment variables safely, then calls
+# the real deploy script. Copy this, review it, and run deploy_sentinel_lab.sh
+# yourself. Do NOT put real subscription IDs, tenant IDs, or secrets in here.
+#
+# 1. Log in with your PERSONAL / TEST Azure account (never a work tenant):
+#      az login
+#      az account show
+#      az account set --subscription "<your personal subscription name or id>"
+#
+# 2. Set the required variables (these are placeholders - edit them):
+#      export RESOURCE_GROUP="rg-sentinel-identity-lab"
+#      export LOCATION="australiaeast"
+#      export WORKSPACE_NAME="law-identity-soar-lab-$RANDOM"
+#      export I_UNDERSTAND_THIS_CREATES_AZURE_RESOURCES=yes
+#
+#    Optional (all default to false / disabled):
+#      export ENABLE_ANALYTICS_RULE=false
+#      export DEPLOY_AUTOMATION_RULE=false
+#      export DEPLOY_PLAYBOOK=false
+#
+# 3. Run the real script:
+#      bash scripts/sentinel/deploy_sentinel_lab.sh
+#
+# 4. When finished, delete everything to stop cost:
+#      az group delete --name "$RESOURCE_GROUP" --yes --no-wait
+#
+# COST WARNING: this creates a Log Analytics workspace + Sentinel, which are
+# billable. Use low retention and clean up promptly.
+echo "This is an EXAMPLE file. Read the comments, set your own variables, then run deploy_sentinel_lab.sh."

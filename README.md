@@ -307,6 +307,23 @@ onboarding, data connectors (Entra ID sign-in/audit, CyberArk via AMA or the
 Logs Ingestion API), watchlists, then analytics rules via the pipeline's deploy
 stage and playbooks as Logic Apps.
 
+## Optional live Sentinel deployment path (Mode C, lab only)
+
+Offline mode is the default. **Mode C** is an optional, lab-only path that can
+actually deploy into a real Microsoft Sentinel workspace using Bicep and Azure
+CLI - in a **personal/test subscription only**.
+
+- Deploys a lab Log Analytics workspace (30-day retention), Sentinel onboarding,
+  and a sample scheduled analytics rule (DET-001), **disabled by default**.
+- Optional, off by default: a non-destructive tagging automation rule and a
+  disabled Logic App playbook skeleton.
+- **No destructive playbooks, no secrets, no tenant/subscription IDs** in the
+  repo. Not production-ready - the rules require tenant-specific tuning, cost
+  review, and change-control approval first.
+
+Details: [docs/LIVE_SENTINEL_DEPLOYMENT_PATH.md](docs/LIVE_SENTINEL_DEPLOYMENT_PATH.md)
+| Infrastructure: [infra/sentinel/](infra/sentinel/)
+
 ## Advanced extension: Datacenter Control Plane Attack Path Lab
 
 A second module, [modules/datacenter-control-plane/](modules/datacenter-control-plane/),

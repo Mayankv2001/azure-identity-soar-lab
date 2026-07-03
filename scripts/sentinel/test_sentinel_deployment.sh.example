@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# ============================================================================
+# EXAMPLE ONLY - how to manually verify a lab Sentinel deployment.
+# ============================================================================
+#
+# These are read-only checks. Copy the commands you need. Set:
+#   export RESOURCE_GROUP="rg-sentinel-identity-lab"
+#   export WORKSPACE_NAME="law-identity-soar-lab-..."
+#
+# 1. Resource group exists:
+#      az group show --name "$RESOURCE_GROUP" -o table
+#
+# 2. Log Analytics workspace exists:
+#      az monitor log-analytics workspace show \
+#        --resource-group "$RESOURCE_GROUP" \
+#        --workspace-name "$WORKSPACE_NAME" \
+#        --query "{name:name, retentionInDays:retentionInDays, sku:sku.name}" -o table
+#
+# 3. Sentinel is enabled (onboarding state 'default' exists):
+#      az resource show \
+#        --ids "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.OperationalInsights/workspaces/$WORKSPACE_NAME/providers/Microsoft.SecurityInsights/onboardingStates/default" \
+#        -o table
+#
+# 4. The sample analytics rule exists (via the Sentinel REST API through az):
+#      az rest --method get \
+#        --url "https://management.azure.com/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.OperationalInsights/workspaces/$WORKSPACE_NAME/providers/Microsoft.SecurityInsights/alertRules?api-version=2023-11-01" \
+#        --query "value[].{name:properties.displayName, enabled:properties.enabled, severity:properties.severity}" -o table
+#
+#    EXPECT: '[LAB] DET-001 MFA Fatigue (Push Bombing)' with enabled=false
+#    (unless you deliberately deployed with ENABLE_ANALYTICS_RULE=true).
+#
+# 5. No destructive playbooks are enabled:
+#      az resource list --resource-group "$RESOURCE_GROUP" \
+#        --resource-type "Microsoft.Logic/workflows" \
+#        --query "[].{name:name, state:properties.state}" -o table
+#
+#    EXPECT: no Logic App, OR a Logic App with state=Disabled. There should be
+#    NO enabled workflow that performs account/credential/network changes.
+echo "This is an EXAMPLE file. Copy the read-only checks you need to verify a lab deployment."
