@@ -1,0 +1,1091 @@
+{
+  "summary": {
+    "rubric": [
+      {
+        "key": "mitre_mapping",
+        "label": "MITRE ATT&CK mapping",
+        "weight": 14
+      },
+      {
+        "key": "data_source",
+        "label": "Data source listed",
+        "weight": 8
+      },
+      {
+        "key": "severity_rationale",
+        "label": "Severity + rationale",
+        "weight": 6
+      },
+      {
+        "key": "version",
+        "label": "Version",
+        "weight": 5
+      },
+      {
+        "key": "owner",
+        "label": "Named owner",
+        "weight": 7
+      },
+      {
+        "key": "false_positive_guidance",
+        "label": "False-positive guidance",
+        "weight": 12
+      },
+      {
+        "key": "response_guidance",
+        "label": "Response guidance",
+        "weight": 12
+      },
+      {
+        "key": "test_coverage",
+        "label": "Automated test coverage",
+        "weight": 12
+      },
+      {
+        "key": "tuning_notes",
+        "label": "Tuning notes",
+        "weight": 10
+      },
+      {
+        "key": "known_limitations",
+        "label": "Known limitations",
+        "weight": 8
+      },
+      {
+        "key": "expected_output",
+        "label": "Expected output contract",
+        "weight": 6
+      }
+    ],
+    "maturity_bands": [
+      {
+        "min_score": 85,
+        "label": "Production candidate (strong) - requires tenant-specific tuning"
+      },
+      {
+        "min_score": 66,
+        "label": "Production candidate - requires tenant-specific tuning"
+      },
+      {
+        "min_score": 41,
+        "label": "Developing"
+      },
+      {
+        "min_score": 0,
+        "label": "Experimental"
+      }
+    ],
+    "detection_count": 15,
+    "average_score": 91.8,
+    "min_score": 87,
+    "max_score": 96,
+    "honest_note": "Scores reflect detection-as-code metadata quality, not production readiness. Every detection is a candidate that requires tenant-specific baselining and tuning before deployment."
+  },
+  "detections": [
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-001",
+      "title": "Risky sign-in from unusual location",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-001-risky-signin.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-002",
+      "title": "MFA fatigue leading to approval",
+      "severity": "Critical",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-002-mfa-fatigue.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-003",
+      "title": "Privileged role activation without change record",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-003-privileged-role-activation.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-004",
+      "title": "Credential added to high-privilege service principal",
+      "severity": "Critical",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-004-sp-credential-added.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-005",
+      "title": "Subscription or resource group permission change",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-005-permission-change.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-006",
+      "title": "NSG or firewall rule opened to the internet",
+      "severity": "Critical",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-006-nsg-public-rule.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-007",
+      "title": "VM management endpoint exposed to the internet",
+      "severity": "Critical",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-007-vm-management-exposed.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Datacenter Control Plane Attack Path Lab",
+      "id": "CP-DET-008",
+      "title": "Correlated identity-to-control-plane attack chain",
+      "severity": "Critical",
+      "version": "1.0.0",
+      "file": "modules/datacenter-control-plane/detections/CP-DET-008-correlated-chain.yaml",
+      "score": 96,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 7
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 6
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-001",
+      "title": "MFA Fatigue (Push Bombing)",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "detections/DET-001-mfa-fatigue.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-002",
+      "title": "Impossible Travel Sign-in",
+      "severity": "Medium",
+      "version": "1.1.0",
+      "file": "detections/DET-002-impossible-travel.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-003",
+      "title": "Conditional Access Policy Modified or Deleted",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "detections/DET-003-conditional-access-change.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-004",
+      "title": "New Credential Added to Service Principal",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "detections/DET-004-service-principal-credential.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-005",
+      "title": "Account Added to Privileged Role or Group",
+      "severity": "High",
+      "version": "1.0.0",
+      "file": "detections/DET-005-privileged-role-addition.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-006",
+      "title": "Anomalous CyberArk Privileged Credential Checkout",
+      "severity": "Medium",
+      "version": "1.0.0",
+      "file": "detections/DET-006-cyberark-checkout-anomaly.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    },
+    {
+      "lab": "Identity Threat Detection & SOAR Lab",
+      "id": "DET-007",
+      "title": "Stale or Orphaned Privileged Account",
+      "severity": "Low",
+      "version": "1.0.0",
+      "file": "detections/DET-007-stale-privileged-account.yaml",
+      "score": 87,
+      "maturity": "Production candidate (strong) - requires tenant-specific tuning",
+      "criteria": {
+        "mitre_mapping": {
+          "label": "MITRE ATT&CK mapping",
+          "max": 14,
+          "earned": 14
+        },
+        "data_source": {
+          "label": "Data source listed",
+          "max": 8,
+          "earned": 8
+        },
+        "severity_rationale": {
+          "label": "Severity + rationale",
+          "max": 6,
+          "earned": 6
+        },
+        "version": {
+          "label": "Version",
+          "max": 5,
+          "earned": 5
+        },
+        "owner": {
+          "label": "Named owner",
+          "max": 7,
+          "earned": 0
+        },
+        "false_positive_guidance": {
+          "label": "False-positive guidance",
+          "max": 12,
+          "earned": 12
+        },
+        "response_guidance": {
+          "label": "Response guidance",
+          "max": 12,
+          "earned": 6
+        },
+        "test_coverage": {
+          "label": "Automated test coverage",
+          "max": 12,
+          "earned": 12
+        },
+        "tuning_notes": {
+          "label": "Tuning notes",
+          "max": 10,
+          "earned": 10
+        },
+        "known_limitations": {
+          "label": "Known limitations",
+          "max": 8,
+          "earned": 8
+        },
+        "expected_output": {
+          "label": "Expected output contract",
+          "max": 6,
+          "earned": 6
+        }
+      }
+    }
+  ]
+}

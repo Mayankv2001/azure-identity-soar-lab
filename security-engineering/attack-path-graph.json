@@ -1,0 +1,37 @@
+{
+  "description": "Machine-readable attack-path graph for the datacenter control-plane scenario (incident CP-INC-2001). Nodes are entities and controls; edges are attacker moves and defensive responses. All values are synthetic.",
+  "incident": "CP-INC-2001",
+  "nodes": [
+    {"id": "identity", "type": "user_identity", "label": "chris.walker@contoso.com", "kind": "attack"},
+    {"id": "mfa", "type": "mfa_event", "label": "MFA fatigue approval", "kind": "attack"},
+    {"id": "role", "type": "privileged_role", "label": "Application Administrator (PIM)", "kind": "attack"},
+    {"id": "sp", "type": "service_principal", "label": "sp-infra-deploy (high-priv)", "kind": "attack"},
+    {"id": "rg", "type": "resource_group", "label": "rg-prod-dc-mgmt", "kind": "attack"},
+    {"id": "nsg", "type": "nsg_rule", "label": "nsg-prod-dc-mgmt allow-rdp-temp 0.0.0.0/0", "kind": "attack"},
+    {"id": "vm", "type": "vm_management_endpoint", "label": "vm-dc-mgmt-01 RDP endpoint", "kind": "attack"},
+    {"id": "incident", "type": "incident", "label": "CP-INC-2001 (blast radius 100/100)", "kind": "detection"},
+    {"id": "playbook", "type": "soar_playbook", "label": "Approval-gated containment playbooks", "kind": "response"},
+    {"id": "policy", "type": "azure_policy", "label": "Deny public management exposure", "kind": "prevention"}
+  ],
+  "edges": [
+    {"from": "identity", "to": "mfa", "relation": "authenticates via", "kind": "attack"},
+    {"from": "mfa", "to": "role", "relation": "escalates to", "kind": "attack"},
+    {"from": "role", "to": "sp", "relation": "adds credential to", "kind": "attack"},
+    {"from": "sp", "to": "rg", "relation": "grants access to", "kind": "attack"},
+    {"from": "rg", "to": "nsg", "relation": "modifies", "kind": "attack"},
+    {"from": "nsg", "to": "vm", "relation": "opens exposure on", "kind": "attack"},
+    {"from": "identity", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "mfa", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "role", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "sp", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "rg", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "nsg", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "vm", "to": "incident", "relation": "triggers", "kind": "detection"},
+    {"from": "playbook", "to": "incident", "relation": "contains", "kind": "response"},
+    {"from": "policy", "to": "nsg", "relation": "prevents", "kind": "prevention"}
+  ],
+  "earliest_break_point": {
+    "node": "policy",
+    "explanation": "The Azure Policy denying public inbound on management ports would have blocked the nsg edge - breaking the chain before the management endpoint was ever exposed. Prevention beats detection at the last mile."
+  }
+}

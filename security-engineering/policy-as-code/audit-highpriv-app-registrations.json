@@ -1,0 +1,30 @@
+{
+  "_comment": "Illustrative only - requires environment-specific testing. Azure Policy that audits application registrations tagged high-privilege so a review workflow can catch over-scoped apps like the sp-infra-deploy in incident CP-INC-2001. App/service-principal permission governance largely lives in Microsoft Entra ID (app consent policies, permission classifications); this policy covers the resource-tagging side that makes those apps discoverable and reviewable.",
+  "properties": {
+    "displayName": "Audit resources associated with high-privilege applications",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Flags resources tagged privilegeTier=high that lack a named owner tag, so high-privilege automation identities cannot go unreviewed.",
+    "metadata": {"category": "Security", "version": "1.0.0"},
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "Audit",
+        "allowedValues": ["Audit", "Disabled"],
+        "metadata": {"displayName": "Effect"}
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {"field": "tags['privilegeTier']", "equals": "high"},
+          {"anyOf": [
+            {"field": "tags['owner']", "exists": "false"},
+            {"field": "tags['owner']", "equals": ""}
+          ]}
+        ]
+      },
+      "then": {"effect": "[parameters('effect')]"}
+    }
+  }
+}

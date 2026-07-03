@@ -1,0 +1,27 @@
+{
+  "_comment": "Illustrative only - test before production. Azure Policy requiring an owner and criticality tag on resources, so every asset can be enriched, prioritised and routed during incident response. You cannot triage an asset nobody owns.",
+  "properties": {
+    "displayName": "Require owner and criticality tags on resources",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Denies creation of resources that lack an 'owner' or 'criticality' tag.",
+    "metadata": {"category": "Tags", "version": "1.0.0"},
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "Audit",
+        "allowedValues": ["Deny", "Audit", "Disabled"],
+        "metadata": {"displayName": "Effect"}
+      }
+    },
+    "policyRule": {
+      "if": {
+        "anyOf": [
+          {"field": "tags['owner']", "exists": "false"},
+          {"field": "tags['criticality']", "exists": "false"}
+        ]
+      },
+      "then": {"effect": "[parameters('effect')]"}
+    }
+  }
+}

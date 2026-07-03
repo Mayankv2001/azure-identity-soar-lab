@@ -1,0 +1,155 @@
+{
+  "description": "Documented test cases for validating each KQL detection before production. The labs execute the Python mirrors; this file records how the KQL itself would be validated in a Sentinel staging workspace. No live KQL is executed here.",
+  "detections": [
+    {
+      "detection": "DET-001", "name": "MFA Fatigue (Push Bombing)",
+      "positive_sample": "5 SigninLogs ResultType 500121 for one user in 10 min + an approved MFA sign-in within 30 min",
+      "negative_sample": "1 missed prompt then an approval, no burst",
+      "expected_alert_count": 1,
+      "false_positive_case": "Device re-enrolment generating a short prompt burst with no attacker IP",
+      "regression_case": "Burst straddling two 10-min bins must still fire (sliding-window check)",
+      "tuning_variable": "burst_threshold (5), burst_window (10m), approval_followup (30m)",
+      "approval_checklist": ["peer-reviewed KQL", "positive+negative validated in staging", "FP review vs 30 days of real prompts"]
+    },
+    {
+      "detection": "DET-002", "name": "Impossible Travel Sign-in",
+      "positive_sample": "Two successful sign-ins implying >900 km/h travel",
+      "negative_sample": "Two sign-ins from the same city",
+      "expected_alert_count": 1,
+      "false_positive_case": "Both IPs in corporate VPN egress 198.51.100.0/24",
+      "regression_case": "v1.1.0 exclusion must suppress VPN pair but keep the foreign-IP true positive",
+      "tuning_variable": "speed_threshold_kmh (900), vpn_egress_range",
+      "approval_checklist": ["VPN egress ranges confirmed with network team", "exclusion tested", "true positive retained"]
+    },
+    {
+      "detection": "DET-003", "name": "Conditional Access Policy Modified or Deleted",
+      "positive_sample": "Update CA policy event by a non-CA-admin actor",
+      "negative_sample": "CA policy update by an authorised CA administrator with a change ticket",
+      "expected_alert_count": 1,
+      "false_positive_case": "Approved change-window edit by the identity platform team",
+      "regression_case": "Deletion (not just update) must also fire",
+      "tuning_variable": "authorised_actors watchlist",
+      "approval_checklist": ["authorised-actor watchlist populated", "break-glass exclusions documented"]
+    },
+    {
+      "detection": "DET-004", "name": "New Credential Added to Service Principal",
+      "positive_sample": "Add SP credentials on a high-privilege app",
+      "negative_sample": "Add SP credentials on a low-privilege monitoring app",
+      "expected_alert_count": 1,
+      "false_positive_case": "Approved pipeline secret rotation",
+      "regression_case": "Certificate add (not just secret) must fire",
+      "tuning_variable": "high-privilege app watchlist, approved rotation principals",
+      "approval_checklist": ["high-priv app watchlist complete", "rotation principals excluded"]
+    },
+    {
+      "detection": "DET-005", "name": "Account Added to Privileged Role or Group",
+      "positive_sample": "Add member to Global Administrator, self-elevation",
+      "negative_sample": "Add member to a normal project group",
+      "expected_alert_count": 1,
+      "false_positive_case": "Ticketed break-glass activation",
+      "regression_case": "Group add (sg-prod-domain-admins) as well as role add must fire",
+      "tuning_variable": "protected roles and groups list",
+      "approval_checklist": ["protected role/group list reviewed", "self-elevation escalation verified"]
+    },
+    {
+      "detection": "DET-006", "name": "Anomalous CyberArk Privileged Credential Checkout",
+      "positive_sample": "4+ ticketless checkouts in 60 min, or any 00:00-05:00 ticketless checkout from the domain-admins safe",
+      "negative_sample": "Ticketed daytime checkouts",
+      "expected_alert_count": 1,
+      "false_positive_case": "Emergency change with a retrospectively raised ticket",
+      "regression_case": "Quiet-hours single checkout must fire even below the burst threshold",
+      "tuning_variable": "burst_threshold (4), quiet_hours (00:00-05:00), Tier-0 safe list",
+      "approval_checklist": ["custom-table ingestion confirmed", "Tier-0 safe list agreed with PAM team"]
+    },
+    {
+      "detection": "DET-007", "name": "Stale or Orphaned Privileged Account",
+      "positive_sample": "Enabled privileged account, no sign-in for 60+ days",
+      "negative_sample": "Active privileged account signing in daily",
+      "expected_alert_count": 3,
+      "false_positive_case": "Intentionally dormant break-glass account",
+      "regression_case": "Orphaned service account (no owner) escalates severity",
+      "tuning_variable": "stale_days (60), break-glass naming exclusion",
+      "approval_checklist": ["identity snapshot freshness confirmed", "break-glass exclusions in place"]
+    },
+    {
+      "detection": "CP-DET-001", "name": "Risky sign-in from unusual location",
+      "positive_sample": "High-risk successful sign-in from a non-usual country",
+      "negative_sample": "Baseline sign-in from the user's usual country",
+      "expected_alert_count": 1,
+      "false_positive_case": "Legitimate travel or VPN egress in another country",
+      "regression_case": "Must not fire on a failed high-risk sign-in (blocked already)",
+      "tuning_variable": "IdentityBaseline watchlist (usual country per user)",
+      "approval_checklist": ["baseline watchlist populated", "travel exceptions process agreed"]
+    },
+    {
+      "detection": "CP-DET-002", "name": "MFA fatigue leading to approval",
+      "positive_sample": "5 failed strong-auth events then an approval within 30 min",
+      "negative_sample": "Failed prompts with no subsequent approval",
+      "expected_alert_count": 1,
+      "false_positive_case": "Re-enrolment burst",
+      "regression_case": "Approval requirement must hold (no approval => no alert)",
+      "tuning_variable": "burst_threshold (5), followup (30m)",
+      "approval_checklist": ["peer review", "staging validation", "FP review"]
+    },
+    {
+      "detection": "CP-DET-003", "name": "Privileged role activation without change record",
+      "positive_sample": "Application Administrator activation with no ticket",
+      "negative_sample": "Ticketed activation",
+      "expected_alert_count": 1,
+      "false_positive_case": "Break-glass with a linked ticket",
+      "regression_case": "All protected roles covered, not just Application Administrator",
+      "tuning_variable": "protected_roles list, ticket-binding field",
+      "approval_checklist": ["PIM ticket-binding confirmed", "break-glass exclusions"]
+    },
+    {
+      "detection": "CP-DET-004", "name": "Credential added to high-privilege service principal",
+      "positive_sample": "Secret added to sp-infra-deploy (high-priv)",
+      "negative_sample": "Secret added to sp-monitoring-reader (low-priv)",
+      "expected_alert_count": 1,
+      "false_positive_case": "Approved rotation on a high-priv app",
+      "regression_case": "Low-privilege SP must never fire",
+      "tuning_variable": "HighPrivilegeServicePrincipals watchlist",
+      "approval_checklist": ["watchlist complete", "rotation principals excluded"]
+    },
+    {
+      "detection": "CP-DET-005", "name": "Subscription or resource group permission change",
+      "positive_sample": "roleAssignments/write granting Owner, no ticket",
+      "negative_sample": "Ticketed deployment write",
+      "expected_alert_count": 1,
+      "false_positive_case": "Approved landing-zone automation",
+      "regression_case": "Subscription-scope grant fires as well as RG-scope",
+      "tuning_variable": "approved automation principals, change-ticket field",
+      "approval_checklist": ["automation principals excluded", "scope coverage verified"]
+    },
+    {
+      "detection": "CP-DET-006", "name": "NSG or firewall rule opened to the internet",
+      "positive_sample": "NSG Allow rule, source 0.0.0.0/0",
+      "negative_sample": "NSG Allow rule, source 10.0.0.0/8",
+      "expected_alert_count": 1,
+      "false_positive_case": "Deliberate tagged public endpoint",
+      "regression_case": "'*' and 'Internet' source values fire as well as 0.0.0.0/0",
+      "tuning_variable": "public prefix list, workload tag exclusions",
+      "approval_checklist": ["public-endpoint exceptions tagged", "pairs with deny policy in Audit"]
+    },
+    {
+      "detection": "CP-DET-007", "name": "VM management endpoint exposed",
+      "positive_sample": "Internet-open management-port rule on a VM with a public IP",
+      "negative_sample": "Same rule on a VM with no public IP",
+      "expected_alert_count": 1,
+      "false_positive_case": "Bastion/JIT-fronted deliberate exposure",
+      "regression_case": "Reachability (public IP) required - permitted-but-unreachable must not fire",
+      "tuning_variable": "management_ports list, AssetInventory public-IP watchlist",
+      "approval_checklist": ["asset inventory current", "JIT/Bastion exceptions documented"]
+    },
+    {
+      "detection": "CP-DET-008", "name": "Correlated identity-to-control-plane chain",
+      "positive_sample": "7 stage alerts sharing identity/SP/RG within 4h",
+      "negative_sample": "3 unrelated benign events on a shared service account",
+      "expected_alert_count": 1,
+      "false_positive_case": "Over-merge on a shared service account",
+      "regression_case": "Requires >=3 distinct stages; 2 stages must not raise the chain",
+      "tuning_variable": "correlation_window (4h), min_stages (3), entity scoping",
+      "approval_checklist": ["entity-scoping reviewed for shared accounts", "severity-escalation timing agreed"]
+    }
+  ]
+}

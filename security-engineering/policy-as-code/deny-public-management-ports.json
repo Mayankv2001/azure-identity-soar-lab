@@ -1,0 +1,30 @@
+{
+  "_comment": "Illustrative only - test in Audit mode before Deny. Azure Policy denying inbound NSG Allow rules from the internet to management ports. Mirrors the module's iac/deny-public-management-exposure.json; kept here as the canonical prevention control for the security-engineering layer.",
+  "properties": {
+    "displayName": "Deny public inbound on management ports (22/3389/5985/5986)",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Denies creation or update of NSG security rules that allow inbound traffic from the internet to SSH, RDP or WinRM management ports.",
+    "metadata": {"category": "Network", "version": "1.0.0"},
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "Audit",
+        "allowedValues": ["Deny", "Audit", "Disabled"],
+        "metadata": {"displayName": "Effect", "description": "Start as Audit, then tighten to Deny."}
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {"field": "type", "equals": "Microsoft.Network/networkSecurityGroups/securityRules"},
+          {"field": "Microsoft.Network/networkSecurityGroups/securityRules/access", "equals": "Allow"},
+          {"field": "Microsoft.Network/networkSecurityGroups/securityRules/direction", "equals": "Inbound"},
+          {"field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix", "in": ["0.0.0.0/0", "*", "Internet"]},
+          {"field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRange", "in": ["22", "3389", "5985", "5986"]}
+        ]
+      },
+      "then": {"effect": "[parameters('effect')]"}
+    }
+  }
+}
