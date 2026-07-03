@@ -30,7 +30,8 @@ def test_all_required_artifacts_exist():
     ]
     missing = [name for name in required if not (SE / name).exists()]
     assert not missing, f"missing security-engineering artefacts: {missing}"
-    assert (ROOT / "docs" / "HIRING_MANAGER_DEMO_PATH.md").exists()
+    # Public-facing orientation doc for reviewers.
+    assert (ROOT / "docs" / "PROJECT_OVERVIEW.md").exists()
 
 
 def test_incident_packet_files_exist():

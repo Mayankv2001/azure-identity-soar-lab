@@ -17,7 +17,7 @@ deployment.
 
 ## What it demonstrates
 
-- Identity-to-cloud attack-path thinking (the incidents CO+I actually cares about)
+- Identity-to-cloud attack-path thinking (the incidents cloud security teams care about)
 - Eight detections spanning Entra ID, Azure Activity, NSG and Defender telemetry
 - Correlation across **identity, service principal and resource scope** - not just by user
 - Explainable **blast-radius scoring** (identity privilege, SP permissions, public exposure, asset criticality, resource count)
@@ -146,12 +146,12 @@ DRI sees *why* it is Critical:
 | Asset criticality | 20 | critical datacenter-management assets |
 | Affected resources | 10 | multiple distinct resources |
 
-## What to show in an interview
+## Best artefact to review first
 
 Open [demo-output/control_plane_timeline.md](demo-output/control_plane_timeline.md)
 - it walks the whole chain chronologically with the blast-radius breakdown and
-the response flow, and it is the single best artefact for explaining
-identity-to-cloud attack-path thinking in two minutes. The talk track is in
+the response flow, and it is the single best artefact for understanding
+identity-to-cloud attack-path thinking. A plain-language explainer is in
 [docs/DATACENTER_CONTROL_PLANE_TALK_TRACK.md](../../docs/DATACENTER_CONTROL_PLANE_TALK_TRACK.md).
 
 ## Honest scope

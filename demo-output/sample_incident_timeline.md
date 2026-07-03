@@ -1,7 +1,7 @@
 # Correlation timeline - how twelve alerts became eight incidents
 
-The single best artefact to walk through in an interview: every alert in
-chronological order, which incident it correlated into, and why it matters.
+A good first artefact to review: every alert in chronological order,
+which incident it correlated into, and why it matters.
 All data is synthetic (generator seed 42, simulation clock 2026-07-01T00:00Z).
 
 | Time (UTC) | Detection | Incident | Entity | Severity | Alert summary | Why it matters | Recommended next action |

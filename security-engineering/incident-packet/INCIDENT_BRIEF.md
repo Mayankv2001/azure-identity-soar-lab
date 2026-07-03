@@ -2,7 +2,7 @@
 
 > Synthetic incident from the Datacenter Control Plane Attack Path Lab. All
 > identities, resources and events are fictional. This packet is written the way
-> a real handover packet reads, so it can be walked through in an interview.
+> a real incident handover packet reads.
 
 | Field | Value |
 |-------|-------|

@@ -1,7 +1,7 @@
 """Export deterministic, GitHub-safe sample artefacts to demo-output/.
 
 Runs the full Mode A pipeline in-memory (same seed, same simulation clock) and
-writes representative outputs an interviewer can read without running anything:
+writes representative outputs a reviewer can read without running anything:
 
     demo-output/sample_alerts.json
     demo-output/sample_incidents.json
@@ -29,7 +29,7 @@ import reporting
 ROOT = Path(__file__).resolve().parents[1]
 DEMO_DIR = ROOT / "demo-output"
 
-# One line per detection: the operational significance an interviewer should hear.
+# One line per detection: the operational significance a reviewer should note.
 WHY_IT_MATTERS = {
     "DET-001": "A valid password is already in attacker hands; the approval is the takeover moment.",
     "DET-002": "Either token/session abuse from attacker infrastructure or VPN egress - attribution decides.",
@@ -75,8 +75,8 @@ def build_timeline(alerts: list[dict], incidents: list[dict]) -> str:
     lines = [
         "# Correlation timeline - how twelve alerts became eight incidents",
         "",
-        "The single best artefact to walk through in an interview: every alert in",
-        "chronological order, which incident it correlated into, and why it matters.",
+        "A good first artefact to review: every alert in chronological order,",
+        "which incident it correlated into, and why it matters.",
         "All data is synthetic (generator seed 42, simulation clock 2026-07-01T00:00Z).",
         "",
         "| Time (UTC) | Detection | Incident | Entity | Severity | Alert summary | Why it matters | Recommended next action |",
