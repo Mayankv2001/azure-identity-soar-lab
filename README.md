@@ -20,10 +20,43 @@ require, or claim, a production Sentinel deployment.
 [correlation timeline](demo-output/sample_incident_timeline.md), which shows
 how twelve alerts became eight incidents and why each one matters.
 
+## Quick review for hiring managers
+
+**a. Review without running.** Read [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
+for orientation, then open the committed sample outputs - no setup required:
+[sample_incident_timeline.md](demo-output/sample_incident_timeline.md) (identity
+lab) and
+[control_plane_timeline.md](modules/datacenter-control-plane/demo-output/control_plane_timeline.md)
+(control-plane module).
+
+**b. Run locally.** Python 3.9+; the demos are standard-library only:
+
+```bash
+python3 src/main.py --demo
+python3 modules/datacenter-control-plane/src/main.py --demo
+python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m pytest -q
+```
+
+**c. Best artefacts to open.** The
+[Attack-Path Graph](security-engineering/attack-path-graph.md) (attack-path
+thinking as a diagram), the
+[Analyst Incident Packet](security-engineering/incident-packet/) (a realistic
+handover packet), and the
+[Detection Quality Scorecard](security-engineering/detection-quality-scorecard.md)
+(honest self-assessment of every detection).
+
+**d. Honest lab-vs-production boundary.** This is a synthetic, offline lab that
+mirrors Microsoft Sentinel and Azure concepts. The KQL is written against common
+Sentinel table names and the IaC/policy files are illustrative - none of it has
+been deployed to a production tenant. My production experience is in identity and
+privileged-access security; this project demonstrates how I extend that thinking
+into cloud security engineering, and it does not claim production Azure-scale
+operations experience.
+
 ## Why I built this
 
-My production background is in identity and privileged-access security (IAM/PAM)
-- investigating identity security signals, incident triage, and building
+My production background is in identity and privileged-access security (IAM/PAM),
+including investigating identity security signals, incident triage, and building
 automation around privileged access. I built this project to express that
 judgement in a cloud security engineering context: to show how identity attacks
 translate into detection engineering, correlation, SOAR, responsible AI, and the
@@ -57,8 +90,9 @@ production experience and what is demonstrated in this lab.
   investigation, not three pages
 - SOAR playbook designs with explicit automation-vs-approval boundaries
 - AI-assisted triage briefings with documented security boundaries
-- A false-positive tuning story with measured impact in the deterministic lab
-  dataset (12.5% to 0% for the seeded scenario - see the honest note below)
+- A false-positive tuning story: a narrow tuning rule removed the seeded
+  false-positive class entirely (see the honest note below - this demonstrates
+  a tuning method, not a real-world zero-false-positive claim)
 - MTTD / MTTR / SLA-adherence / FP-rate metrics computed from the incident
   lifecycle
 - Azure DevOps validation pipeline (validate, test, package, approval-gated
@@ -69,32 +103,18 @@ production experience and what is demonstrated in this lab.
 
 ```mermaid
 flowchart LR
-    subgraph GEN["Synthetic telemetry (seed 42)"]
-        A["Entra ID sign-in logs"]
-        B["Entra ID audit logs"]
-        C["CyberArk EPV events"]
-        D["identity + asset inventory"]
-    end
-
-    E["Detection engine<br/>7 KQL-mirrored detections<br/>+ explainable severity"]
-    F["Correlation engine<br/>user + 60-min window"]
-    G["AI triage summary<br/>bounded, advisory-only"]
-    H["SOAR playbooks<br/>approval-gated response"]
-    R["Metrics + reporting<br/>MTTD / MTTR / SLA / FP rate"]
-
-    GEN --> E -- "12 alerts" --> F -- "8 incidents" --> G
-    F --> R
-    G -.advises.-> H
-
-    subgraph DAC["Detection-as-code"]
-        K["detections/*.kql"]
-        Y["detections/*.yaml"]
-        P["Azure DevOps pipeline<br/>validate - test - package - gated deploy"]
-    end
-    K -. same thresholds .- E
-    Y --> P
-    P -. documented path .-> S["Microsoft Sentinel (Mode B)"]
+    A["Synthetic telemetry"] --> B["Detections"]
+    B --> C["Alerts"]
+    C --> D["Correlation"]
+    D --> E["Incidents"]
+    E --> F["AI triage"]
+    F --> G["SOAR playbooks"]
+    E --> H["Metrics / reporting"]
 ```
+
+Detections are written as KQL, mirrored as a tested Python engine, and shipped
+through an Azure DevOps pipeline (validate, test, package, approval-gated
+deploy) - see [Detection-as-code and CI](#detection-as-code-and-ci) below.
 
 ## Demo in 5 minutes
 
@@ -117,10 +137,10 @@ Expected output:
   disables a Conditional Access policy - three detections in 30 minutes,
   correctly correlated into one Critical incident
 - **Metrics:** MTTD 1.4 h, MTTR 12.7 h, SLA adherence 93.8% (one honest
-  breach), and a false-positive rate that drops from 12.5% to 0% for the seeded
-  scenario after rule v1.1.0. That 0% is deterministic lab tuning against a fixed
-  dataset - a demonstration of the tuning *method*, not a claim of zero false
-  positives in a real, noisy environment.
+  breach). A narrow tuning rule (v1.1.0) removed the seeded false-positive
+  class entirely - this demonstrates the tuning *method* on a fixed,
+  deterministic dataset, not a claim of zero false positives in a real, noisy
+  environment.
 
 Tests and validation (dev dependencies only):
 
@@ -216,8 +236,9 @@ Full write-up: [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md).
   severity-driven SLA clocks, a first-15-minutes runbook, blameless RCA
   ([docs/DRI_RUNBOOK.md](docs/DRI_RUNBOOK.md)).
 - **False-positive reduction:** disposition data feeds narrow, versioned,
-  tested exclusions - the seeded scenario goes 12.5% to 0% with zero lost true
-  positives (deterministic lab tuning, not a real-world zero-FP claim).
+  tested exclusions - a narrow tuning rule removed the seeded false-positive
+  class with zero lost true positives (deterministic lab tuning method, not a
+  real-world zero-false-positive claim).
 - **Operational metrics:** MTTD, MTTR and SLA adherence computed from the
   incident lifecycle, with the one breach displayed rather than buried.
 - **Responsible AI:** the AI briefs, the human decides, the playbook acts.
@@ -294,7 +315,7 @@ the seam where cloud security engineering actually operates.
 
 **What it demonstrates:** one correlated attack chain from a risky sign-in ->
 MFA fatigue -> ticketless privileged-role activation -> credential added to a
-high-privilege service principal -> Owner granted on a datacenter-management
+high-privilege service principal -> Owner granted on a synthetic cloud-management
 resource group -> an NSG rule opening RDP to `0.0.0.0/0` on a reachable
 management jumpbox. Eight KQL-mirrored detections across Entra ID, Azure
 Activity and Defender telemetry are correlated by identity, service principal
@@ -342,39 +363,6 @@ automation. This layer shows how I think about cloud security engineering,
 detection maturity, responsible automation and identity-to-infrastructure risk -
 on synthetic data, mirroring Sentinel and Azure concepts, without claiming
 production deployment.
-
-## Quick review for hiring managers
-
-**a. Review without running.** Read [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
-for orientation, then open the committed sample outputs - no setup required:
-[sample_incident_timeline.md](demo-output/sample_incident_timeline.md) (identity
-lab) and
-[control_plane_timeline.md](modules/datacenter-control-plane/demo-output/control_plane_timeline.md)
-(control-plane module).
-
-**b. Run locally.** Python 3.9+; the demos are standard-library only:
-
-```bash
-python3 src/main.py --demo
-python3 modules/datacenter-control-plane/src/main.py --demo
-python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && python3 -m pytest -q
-```
-
-**c. Best artefacts to open.** The
-[Attack-Path Graph](security-engineering/attack-path-graph.md) (attack-path
-thinking as a diagram), the
-[Analyst Incident Packet](security-engineering/incident-packet/) (a realistic
-handover packet), and the
-[Detection Quality Scorecard](security-engineering/detection-quality-scorecard.md)
-(honest self-assessment of every detection).
-
-**d. Honest lab-vs-production boundary.** This is a synthetic, offline lab that
-mirrors Microsoft Sentinel and Azure concepts. The KQL is written against common
-Sentinel table names and the IaC/policy files are illustrative - none of it has
-been deployed to a production tenant. My production experience is in identity and
-privileged-access security; this project demonstrates how I extend that thinking
-into cloud security engineering, and it does not claim production Azure-scale
-operations experience.
 
 ## License
 

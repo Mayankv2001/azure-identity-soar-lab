@@ -4,7 +4,7 @@ Blameless RCA for the synthetic control-plane attack chain. Focus is on the cont
 
 ## What happened
 
-A high-risk sign-in for chris.walker@contoso.com from an unusual country was followed by an MFA-fatigue approval, a ticketless privileged-role activation, a credential added to a high-privilege service principal, an Owner grant on the datacenter-management resource group, and an NSG rule opening RDP to the internet on a reachable management jumpbox. Eight detections correlated into one Critical incident with a blast-radius score of 100/100.
+A high-risk sign-in for chris.walker@contoso.com from an unusual country was followed by an MFA-fatigue approval, a ticketless privileged-role activation, a credential added to a high-privilege service principal, an Owner grant on a synthetic cloud-management resource group, and an NSG rule opening RDP to the internet on a reachable management jumpbox. Eight detections correlated into one Critical incident with a blast-radius score of 100/100.
 
 ## Root causes (controls that failed)
 

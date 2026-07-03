@@ -11,7 +11,7 @@ The parent lab stops at the identity plane. This module follows the attacker
 across the bridge into Azure infrastructure. It replays one chain: a risky
 sign-in from an unusual country, MFA fatigue until the user approves, a
 ticketless privileged-role activation, a credential added to a high-privilege
-service principal, that principal granted Owner on the datacenter-management
+service principal, that principal granted Owner on a synthetic cloud-management
 resource group, and finally an NSG rule opening RDP to the whole internet on a
 reachable management jumpbox. Eight detections fire across Entra ID, Azure
 Activity and Defender-style telemetry - and instead of eight disconnected

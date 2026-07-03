@@ -24,8 +24,9 @@ net, then own end-to-end improvements.
 - **Identify noisy detections.** Pick the highest false-positive contributors
   from the day-1-30 map.
 - **Tune false positives.** Ship one narrow, versioned, tested exclusion through
-  the pipeline - the way this repo does the DET-002 VPN-egress exclusion
-  (12.5% to 0% with zero lost true positives). No broad suppression.
+  the pipeline - the way this repo does the DET-002 VPN-egress exclusion, which
+  removed the seeded false-positive class through a narrow tuning rule with zero
+  lost true positives. No broad suppression.
 - **Build one automation.** Eliminate a piece of manual toil - an enrichment
   step, a repetitive triage lookup - the way my CyberArk lifecycle automation
   removed ~100 engineer-hours a month.

@@ -84,9 +84,9 @@ without running anything - start with the timelines under `demo-output/` and
 - The detections are **reference implementations** - production use would add
   behavioural baselining, broader coverage (e.g. token theft), and
   ingestion-cost engineering.
-- The metrics (including the 12.5% to 0% false-positive figure) are computed on a
-  fixed, deterministic dataset. They demonstrate the method, not real-world
-  numbers.
+- The metrics (including the false-positive tuning result, where a narrow
+  tuning rule removed the seeded false-positive class) are computed on a fixed,
+  deterministic dataset. They demonstrate the method, not real-world numbers.
 - The AI component defaults to a deterministic offline template; the optional
   Azure OpenAI mode is untested at scale.
 

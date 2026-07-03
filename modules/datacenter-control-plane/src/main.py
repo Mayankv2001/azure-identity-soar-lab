@@ -118,8 +118,8 @@ def build_rca(incident, data) -> str:
         f"A high-risk sign-in for {incident['alerts'][0]['entity']} from an "
         "unusual country was followed by an MFA-fatigue approval, a ticketless "
         "privileged-role activation, a credential added to a high-privilege "
-        "service principal, an Owner grant on the datacenter-management resource "
-        "group, and an NSG rule opening RDP to the internet on a reachable "
+        "service principal, an Owner grant on a synthetic cloud-management "
+        "resource group, and an NSG rule opening RDP to the internet on a reachable "
         "management jumpbox. Eight detections correlated into one Critical "
         f"incident with a blast-radius score of "
         f"{incident['blast_radius']['score']}/100.",

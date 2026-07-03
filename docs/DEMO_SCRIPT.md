@@ -26,10 +26,10 @@ are worth reading in the output:
   incident.
 
 Headline metrics: MTTD 1.4 h, MTTR 12.7 h, SLA adherence 93.8% (one deliberate
-breach kept visible), and a false-positive rate that drops from 12.5% to 0% for
-the seeded VPN scenario after the v1.1.0 tuning change. That 0% is deterministic
-lab tuning against a fixed dataset - it demonstrates the tuning method, not a
-real-world zero-false-positive claim.
+breach kept visible). The v1.1.0 tuning change removed the seeded VPN
+false-positive class through a narrow tuning rule - this demonstrates the
+tuning method on a fixed, deterministic dataset, not a real-world
+zero-false-positive claim.
 
 ## 2. Run the control-plane module
 
@@ -39,10 +39,10 @@ python3 modules/datacenter-control-plane/src/main.py --demo
 
 This follows a compromised identity across the Azure control plane: risky
 sign-in, MFA fatigue, ticketless privileged-role activation, a credential added
-to a high-privilege service principal, an Owner grant on a datacenter-management
-resource group, and an NSG rule opening RDP to the internet on a reachable
-management jumpbox. Eight detections correlate into one Critical incident with an
-explainable blast-radius score of 100/100.
+to a high-privilege service principal, an Owner grant on a synthetic
+cloud-management resource group, and an NSG rule opening RDP to the internet on
+a reachable management jumpbox. Eight detections correlate into one Critical
+incident with an explainable blast-radius score of 100/100.
 
 ## 3. Read the key artefacts (no run required)
 
