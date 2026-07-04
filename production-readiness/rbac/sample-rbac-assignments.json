@@ -1,0 +1,148 @@
+{
+  "$schema_note": "Fictional, illustrative RBAC assignments for a synthetic, offline-first Microsoft Sentinel lab. NO real GUIDs, subscription IDs, tenant IDs, or secrets. All personas are @contoso.com. All scopes are placeholders: the string 'sub-lab' or the all-zero GUID 00000000-0000-0000-0000-000000000000. See RBAC_REVIEW_MODEL.md and SENTINEL_RBAC_MATRIX.md.",
+  "generated": "2026-07-04",
+  "review_cadence": "quarterly (standing privilege), on-event (joiner/mover/leaver), annual (full recertification)",
+  "scope_placeholders": {
+    "subscription": "/subscriptions/sub-lab",
+    "workspace": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+    "playbook_resource_group": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab",
+    "directory": "/providers/Microsoft.aadiam",
+    "all_zero_guid": "00000000-0000-0000-0000-000000000000"
+  },
+  "assignments": [
+    {
+      "persona": "wei.zhang@contoso.com",
+      "display_name": "Wei Zhang",
+      "function": "SOC Analyst (Tier 1 triage)",
+      "role": "Microsoft Sentinel Reader",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "permanent",
+      "justification": "Tier 1 triage needs to read incidents, analytics rules, workbooks and hunting queries. Read-only floor role; cannot run response actions or change incident ownership.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "wei.zhang@contoso.com",
+      "display_name": "Wei Zhang",
+      "function": "SOC Analyst (Tier 1 triage)",
+      "role": "Log Analytics Reader",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "permanent",
+      "justification": "Read access to underlying tables (SigninLogs, AuditLogs, CyberArk_EPV_CL) for KQL hunting and investigation during triage. Read-only on the data plane.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "omar.haddad@contoso.com",
+      "display_name": "Omar Haddad",
+      "function": "Senior SOC Analyst / DRI (on-call responder)",
+      "role": "Microsoft Sentinel Responder",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "permanent",
+      "justification": "DRI owns incidents end-to-end during a shift: assign, change status, comment, and run playbooks. Destructive playbook runs still hit the run-time approval gate. Cannot author or edit analytics rules.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "omar.haddad@contoso.com",
+      "display_name": "Omar Haddad",
+      "function": "Senior SOC Analyst / DRI (on-call responder)",
+      "role": "Log Analytics Reader",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "permanent",
+      "justification": "Investigation hunting during incident response. Read-only on the data plane.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "ravi.menon@contoso.com",
+      "display_name": "Ravi Menon",
+      "function": "Detection Engineering Lead",
+      "role": "Microsoft Sentinel Contributor",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "pim_eligible",
+      "justification": "Authors and code-reviews analytics rules; needs hotfix/rollback ability in an incident. Routine changes still ship through the approval-gated pipeline. PIM-eligible with activation approval rather than a permanent standing grant. Author-not-deployer: does not hold the automation identity.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "ravi.menon@contoso.com",
+      "display_name": "Ravi Menon",
+      "function": "Detection Engineering Lead",
+      "role": "Logic App Contributor",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab",
+      "scope_level": "resource_group",
+      "assignment_type": "pim_eligible",
+      "justification": "Build and edit Logic App playbooks in the playbook resource group. Deploy-time capability only; running destructive playbooks is separately gated. PIM-eligible.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "hana.kovac@contoso.com",
+      "display_name": "Hana Kovac",
+      "function": "SecOps Manager / Approver",
+      "role": "Microsoft Sentinel Reader",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "permanent",
+      "justification": "Oversight read of incidents and rules. Approver of playbook change gate and destructive-run escalations for Tier-0 assets. Deliberately not a detection author (author != change approver) and holds no Contributor/deploy rights.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "elena.petrova@contoso.com",
+      "display_name": "Elena Petrova",
+      "function": "Security / Sentinel platform admin",
+      "role": "Security Admin",
+      "scope": "/providers/Microsoft.aadiam",
+      "scope_level": "directory",
+      "assignment_type": "pim_eligible",
+      "justification": "Platform ownership: manage security configuration, data connectors and policy state. Broad-reach directory-plane role kept to a single holder and PIM-eligible. Not a day-to-day triage role; holds no workspace Contributor rights.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "elena.petrova@contoso.com",
+      "display_name": "Elena Petrova",
+      "function": "Security / Sentinel platform admin",
+      "role": "Security Reader",
+      "scope": "/providers/Microsoft.aadiam",
+      "scope_level": "directory",
+      "assignment_type": "permanent",
+      "justification": "Standing read of cross-service security posture (Conditional Access, Defender) for platform oversight and DET-003 context. Read-only Entra-plane role.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "svc-sentinel-deploy@contoso.com",
+      "display_name": "Sentinel deployment identity (non-interactive)",
+      "function": "Automation / CI-CD deployment identity",
+      "role": "Microsoft Sentinel Contributor",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "assignment_type": "service_principal",
+      "justification": "The ONLY principal that writes analytics rules to the workspace, and only from the pipeline's approval-gated Deploy stage. Non-interactive, no human login. Workspace-scoped; scope creep is a review finding. Credential rotated on schedule; no secret stored in the repo.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "svc-sentinel-deploy@contoso.com",
+      "display_name": "Sentinel deployment identity (non-interactive)",
+      "function": "Automation / CI-CD deployment identity",
+      "role": "Logic App Contributor",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab",
+      "scope_level": "resource_group",
+      "assignment_type": "service_principal",
+      "justification": "Deploys and enables Logic App playbook definitions from the gated pipeline. Resource-group-scoped to the playbook RG only. Non-interactive.",
+      "review_due": "2026-10-04"
+    },
+    {
+      "persona": "break-glass-01@contoso.com",
+      "display_name": "Emergency break-glass account (normally disabled)",
+      "function": "Emergency access only",
+      "role": "Owner",
+      "scope": "/subscriptions/sub-lab/resourceGroups/rg-sentinel-identity-lab/providers/Microsoft.OperationalInsights/workspaces/law-identity-soar-lab",
+      "scope_level": "workspace",
+      "scope_object_id_placeholder": "00000000-0000-0000-0000-000000000000",
+      "assignment_type": "break_glass",
+      "account_state": "disabled",
+      "justification": "Emergency full control of the detection estate when the automation path is broken and an approver is unreachable during a Critical incident. Held by no working human. Workspace-scoped only (never subscription/tenant Owner). Normally disabled; every enable/sign-in raises a Critical alert and mandates a blameless RCA, credential rotation and re-disable. No credential material stored in the repo.",
+      "review_due": "2026-10-04"
+    }
+  ]
+}

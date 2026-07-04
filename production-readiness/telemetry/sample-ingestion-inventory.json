@@ -1,0 +1,107 @@
+{
+  "_comment": "ILLUSTRATIVE synthetic-lab inventory. Not a live ingestion report. Every source has status 'synthetic' (generated offline; no Sentinel workspace, no data connector). 'est_daily_gb' values are made-up, order-of-magnitude figures for illustration only and were never measured. Owners are fictional @contoso.com personas. See production-readiness/telemetry/LOG_SOURCE_COVERAGE_MATRIX.md and SYNTHETIC_TO_REAL_TELEMETRY_MAPPING.md for the mappings this file summarises.",
+  "_meta": {
+    "generated": "2026-07",
+    "detection_count": 15,
+    "telemetry_level": "0 (synthetic)",
+    "note": "All figures illustrative. No real telemetry, no live connectors, no production tenant."
+  },
+  "sources": [
+    {
+      "source": "Entra ID sign-in events (synthetic)",
+      "sentinel_table": "SigninLogs",
+      "status": "synthetic",
+      "est_daily_gb": 4.5,
+      "owner": "priya.sharma@contoso.com",
+      "used_by": ["DET-001", "DET-002", "CP-DET-001", "CP-DET-002"]
+    },
+    {
+      "source": "Entra ID directory audit events (synthetic)",
+      "sentinel_table": "AuditLogs",
+      "status": "synthetic",
+      "est_daily_gb": 1.2,
+      "owner": "priya.sharma@contoso.com",
+      "used_by": ["DET-003", "DET-004", "DET-005", "CP-DET-003", "CP-DET-004"]
+    },
+    {
+      "source": "Azure Resource Manager control-plane activity (synthetic)",
+      "sentinel_table": "AzureActivity",
+      "status": "synthetic",
+      "est_daily_gb": 2.0,
+      "owner": "chris.walker@contoso.com",
+      "used_by": ["CP-DET-005", "CP-DET-006", "CP-DET-007"]
+    },
+    {
+      "source": "Defender / analytics-rule alerts (synthetic)",
+      "sentinel_table": "SecurityAlert",
+      "status": "synthetic",
+      "est_daily_gb": 0.3,
+      "owner": "chris.walker@contoso.com",
+      "used_by": ["CP-DET-008"]
+    },
+    {
+      "source": "CyberArk EPV privileged-access events (synthetic custom log)",
+      "sentinel_table": "CyberArk_EPV_CL",
+      "status": "synthetic",
+      "est_daily_gb": 0.6,
+      "owner": "liam.oconnor@contoso.com",
+      "used_by": ["DET-006"]
+    },
+    {
+      "source": "Conditional Access policy admin allow-list (synthetic watchlist)",
+      "sentinel_table": "Watchlist:CAPolicyAdmins",
+      "status": "synthetic",
+      "est_daily_gb": 0.01,
+      "owner": "amelia.chen@contoso.com",
+      "used_by": ["DET-003"]
+    },
+    {
+      "source": "High-privilege application inventory (synthetic watchlist)",
+      "sentinel_table": "Watchlist:HighPrivilegeApps",
+      "status": "synthetic",
+      "est_daily_gb": 0.01,
+      "owner": "amelia.chen@contoso.com",
+      "used_by": ["DET-004"]
+    },
+    {
+      "source": "Privileged identity register (synthetic watchlist)",
+      "sentinel_table": "Watchlist:PrivilegedIdentities",
+      "status": "synthetic",
+      "est_daily_gb": 0.01,
+      "owner": "amelia.chen@contoso.com",
+      "used_by": ["DET-007"]
+    },
+    {
+      "source": "Sign-in baseline reference (synthetic watchlist)",
+      "sentinel_table": "Watchlist:IdentityBaseline",
+      "status": "synthetic",
+      "est_daily_gb": 0.02,
+      "owner": "jordan.lee@contoso.com",
+      "used_by": ["CP-DET-001"]
+    },
+    {
+      "source": "High-privilege service principal inventory (synthetic watchlist)",
+      "sentinel_table": "Watchlist:HighPrivilegeServicePrincipals",
+      "status": "synthetic",
+      "est_daily_gb": 0.01,
+      "owner": "jordan.lee@contoso.com",
+      "used_by": ["CP-DET-004"]
+    },
+    {
+      "source": "Asset / CMDB management-endpoint register (synthetic watchlist)",
+      "sentinel_table": "Watchlist:AssetInventory",
+      "status": "synthetic",
+      "est_daily_gb": 0.02,
+      "owner": "mark.taylor@contoso.com",
+      "used_by": ["CP-DET-007"]
+    },
+    {
+      "source": "Control-plane alert correlation set (synthetic watchlist)",
+      "sentinel_table": "Watchlist:ControlPlaneAlerts",
+      "status": "synthetic",
+      "est_daily_gb": 0.01,
+      "owner": "chris.walker@contoso.com",
+      "used_by": ["CP-DET-008"]
+    }
+  ]
+}

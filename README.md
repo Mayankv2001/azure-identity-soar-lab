@@ -381,6 +381,24 @@ detection maturity, responsible automation and identity-to-infrastructure risk -
 on synthetic data, mirroring Sentinel and Azure concepts, without claiming
 production deployment.
 
+## Production Readiness & Operations Layer
+
+The gap between a lab Sentinel deployment and a production security operations
+capability is not more detections - it is the operating controls around them.
+[production-readiness/](production-readiness/) documents that gap honestly, using
+**no real company or customer data**: telemetry maturity and source mappings,
+data-connector runbooks, an incident-response operating model, a detection-tuning
+and promotion workflow, change approval, RBAC least-privilege review, Sentinel
+cost governance, a DRI/on-call model, playbook validation, and ongoing
+maintenance/ownership.
+
+It scores the project against ten production-readiness dimensions and is candid
+about the result: **55/100 - "Production candidate"**, strong on documentation
+and lab design, not production-ready because no real enterprise telemetry or
+tuning exists yet. See
+[production-readiness/README.md](production-readiness/README.md) and the
+[production readiness scorecard](production-readiness/reports/PRODUCTION_READINESS_SCORECARD.md).
+
 ## License
 
 MIT - see [LICENSE](LICENSE).

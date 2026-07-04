@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "1.0",
+  "schemaNote": "Illustrative lab dashboard spec - not an official Azure/Sentinel workbook schema. Tiles map to named queries in COST_MONITORING_QUERIES.kql.",
+  "dashboard": {
+    "id": "sentinel-cost-dashboard-lab",
+    "title": "Sentinel Cost & Ingestion Dashboard (Lab, Illustrative)",
+    "description": "Illustrative cost-monitoring dashboard for the offline Azure Identity Threat Detection & SOAR lab. Tiles reference the queries in COST_MONITORING_QUERIES.kql. All thresholds and figures are illustrative (AUD, GST-exclusive) and must be tuned to a real workspace before use.",
+    "owner": "Cloud Security Engineering",
+    "labOnly": true,
+    "illustrative": true,
+    "currency": "AUD",
+    "workspaceRetentionDaysDefault": 30,
+    "defaultTimeRange": "Last30Days",
+    "refreshMinutes": 60,
+    "dataSource": {
+      "table": "Usage",
+      "note": "Read-only ingestion-volume analysis over the Log Analytics Usage table. Quantity is in MBytes; GB = Quantity / 1024."
+    },
+    "tiles": [
+      {
+        "id": "tile-volume-by-table",
+        "title": "Data volume by table (30d)",
+        "type": "barchart",
+        "queryName": "1. Data volume by table (last 30 days)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "warnGB": 60,
+          "alertGB": 90,
+          "note": "Illustrative per-table 30-day totals; alert if any single table dominates unexpectedly."
+        }
+      },
+      {
+        "id": "tile-ingestion-by-day",
+        "title": "Workspace ingestion by day (30d)",
+        "type": "timechart",
+        "queryName": "2. Ingestion by day (workspace total, last 30 days)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB/day",
+        "thresholds": {
+          "targetGB": 21.1,
+          "softGB": 26.0,
+          "hardGB": 30.0,
+          "note": "Illustrative workspace totals from INGESTION_BUDGET.md; hard threshold also governed by the daily cap."
+        }
+      },
+      {
+        "id": "tile-ingestion-by-day-per-table",
+        "title": "Ingestion by day, per table (14d)",
+        "type": "timechart",
+        "queryName": "3. Ingestion by day, per table (last 14 days)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB/day",
+        "thresholds": {
+          "note": "No fixed threshold; used to attribute a total-volume spike to a specific table."
+        }
+      },
+      {
+        "id": "tile-top-noisy-tables",
+        "title": "Top noisy tables (7d, share of total)",
+        "type": "table",
+        "queryName": "4. Top noisy tables (last 7 days, ranked, with share of total)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "warnPctOfTotal": 30,
+          "alertPctOfTotal": 45,
+          "note": "Flag any single table taking an outsized share of workspace volume; cross-check with the coverage tile."
+        }
+      },
+      {
+        "id": "tile-daily-spike",
+        "title": "Daily spike vs 7-day average",
+        "type": "singlestat",
+        "queryName": "5. Daily spike detector (yesterday vs trailing 7-day average)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "boolean",
+        "thresholds": {
+          "spikeFactor": 1.25,
+          "alertOn": "SpikeDetected == true",
+          "severity": "Medium",
+          "note": "Fires when yesterday's ingestion is >25% above the trailing 7-day average."
+        }
+      },
+      {
+        "id": "tile-per-table-budget-breach",
+        "title": "Per-table budget breaches (yesterday)",
+        "type": "table",
+        "queryName": "6. Per-table budget breach (yesterday vs illustrative hard thresholds)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "severity": "Medium",
+          "perTableHardGB": {
+            "SigninLogs": 4.5,
+            "AuditLogs": 2.0,
+            "AzureActivity": 4.0,
+            "CyberArk_EPV_CL": 0.8,
+            "SecurityEvent": 14.0,
+            "Syslog": 12.0
+          },
+          "note": "Mirrors the Hard (alert) column in INGESTION_BUDGET.md; any breached row is an alert."
+        }
+      },
+      {
+        "id": "tile-new-tables",
+        "title": "Unexpected new tables (3d)",
+        "type": "table",
+        "queryName": "7. Unexpected new tables (appeared in last 3d, absent in prior 30d)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "count",
+        "thresholds": {
+          "alertOn": "any row returned",
+          "severity": "Low",
+          "note": "A new table without a budget line means a connector was enabled without governance."
+        }
+      },
+      {
+        "id": "tile-volume-no-detection",
+        "title": "Volume without detection coverage (7d)",
+        "type": "table",
+        "queryName": "8. Tables with volume but (illustratively) no detection coverage",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "warnGB": 5,
+          "severity": "Low",
+          "note": "Ingestion you pay for but no analytics rule reads - candidate to filter, tier down, or drop."
+        }
+      },
+      {
+        "id": "tile-billable-split",
+        "title": "Billable vs non-billable (30d)",
+        "type": "piechart",
+        "queryName": "9. Billable vs non-billable split (last 30 days)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "note": "Confirms how much ingested volume is actually charged."
+        }
+      },
+      {
+        "id": "tile-volume-by-solution",
+        "title": "Volume by Sentinel solution (30d)",
+        "type": "barchart",
+        "queryName": "10. Volume by Sentinel solution (last 30 days)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "note": "Attributes cost to solutions/connectors rather than raw tables."
+        }
+      },
+      {
+        "id": "tile-est-monthly-cost",
+        "title": "Illustrative monthly cost by table (AUD)",
+        "type": "table",
+        "queryName": "11. Cost investigation starting point - illustrative monthly A$ estimate",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "AUD",
+        "thresholds": {
+          "rateAudPerGb": 4.0,
+          "note": "Planning estimate only - NOT a bill. Use Azure Cost Management for real charges."
+        }
+      },
+      {
+        "id": "tile-daily-cap",
+        "title": "Approaching daily cap (today, running)",
+        "type": "gauge",
+        "queryName": "12. Approaching the daily cap (running total for the current UTC day)",
+        "queryFile": "COST_MONITORING_QUERIES.kql",
+        "unit": "GB",
+        "thresholds": {
+          "capGB": 30.0,
+          "labCapGB": 1.0,
+          "warnFraction": 0.8,
+          "alertOn": "ApproachingCap == true",
+          "severity": "High",
+          "note": "Illustrative production cap 30 GB/day (lab cap 1 GB/day); warn at 80% of cap."
+        }
+      }
+    ],
+    "budgetAlerts": {
+      "azureBudgetScope": "Sentinel + Log Analytics resource group",
+      "financialThresholdsPctOfForecast": [50, 80, 100],
+      "notify": "Cloud Security Engineering",
+      "note": "Azure Budget is the financial backstop; the KQL tiles above are the data backstop. Figures are illustrative AUD."
+    },
+    "references": [
+      "SENTINEL_COST_MODEL.md",
+      "INGESTION_BUDGET.md",
+      "RETENTION_POLICY.md",
+      "COST_MONITORING_QUERIES.kql"
+    ]
+  }
+}

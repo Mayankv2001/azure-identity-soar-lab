@@ -1,0 +1,21 @@
+{
+  "_comment": "Illustrative, synthetic rule owner register. Fictional personas (@contoso.com). No detection is production approved.",
+  "generated": "2026-07-04",
+  "rules": [
+    {"rule_id": "DET-001", "name": "MFA Fatigue (Push Bombing)", "owner": "ravi.menon@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Simulated"},
+    {"rule_id": "DET-002", "name": "Impossible Travel Sign-in", "owner": "ravi.menon@contoso.com", "version": "1.1.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Simulated"},
+    {"rule_id": "DET-003", "name": "Conditional Access Policy Modified or Deleted", "owner": "ravi.menon@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Draft"},
+    {"rule_id": "DET-004", "name": "New Credential Added to Service Principal", "owner": "ravi.menon@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Draft"},
+    {"rule_id": "DET-005", "name": "Account Added to Privileged Role or Group", "owner": "ravi.menon@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Draft"},
+    {"rule_id": "DET-006", "name": "Anomalous CyberArk Privileged Credential Checkout", "owner": "ravi.menon@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Draft"},
+    {"rule_id": "DET-007", "name": "Stale or Orphaned Privileged Account", "owner": "ravi.menon@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-01", "next_review": "2026-08-01", "promotion_state": "Draft"},
+    {"rule_id": "CP-DET-001", "name": "Risky sign-in from unusual location", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Simulated"},
+    {"rule_id": "CP-DET-002", "name": "MFA fatigue leading to approval", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Simulated"},
+    {"rule_id": "CP-DET-003", "name": "Privileged role activation without change record", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Draft"},
+    {"rule_id": "CP-DET-004", "name": "Credential added to high-privilege service principal", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Draft"},
+    {"rule_id": "CP-DET-005", "name": "Subscription or resource group permission change", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Draft"},
+    {"rule_id": "CP-DET-006", "name": "NSG or firewall rule opened to the internet", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Draft"},
+    {"rule_id": "CP-DET-007", "name": "VM management endpoint exposed", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Draft"},
+    {"rule_id": "CP-DET-008", "name": "Correlated identity-to-control-plane chain", "owner": "amara.okafor@contoso.com", "version": "1.0.0", "last_reviewed": "2026-07-04", "next_review": "2026-08-04", "promotion_state": "Simulated"}
+  ]
+}

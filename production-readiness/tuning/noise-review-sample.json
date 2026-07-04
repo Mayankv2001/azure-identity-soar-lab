@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "description": "Illustrative weekly false-positive disposition roll-up per detection. Synthetic lab data - no rule here is production approved. Each disposition record captures the shape a real detection-engineering team aggregates from labelled alert dispositions to drive tuning by data rather than opinion.",
+    "framing": "This is a synthetic, offline Microsoft Sentinel-style lab. Counts are illustrative. Only DET-002 / 2026-W26 corresponds to a change realised in code (the v1.1.0 VPN-egress exclusion); the rest demonstrate the roll-up shape.",
+    "record_schema": {
+      "rule": "detection id (DET-00x or CP-DET-00x)",
+      "week": "ISO week label, e.g. 2026-W26",
+      "alert_count": "total alerts the rule raised that week",
+      "fp_count": "alerts dispositioned false_positive or benign_positive",
+      "benign_cause": "controlled benign-cause label, or null when no FPs",
+      "action": "the tuning action taken or proposed for that cause"
+    },
+    "benign_cause_vocabulary": [
+      "corp_vpn_egress",
+      "mobile_carrier_nat",
+      "approved_pipeline_rotation",
+      "scheduled_admin_change",
+      "device_reenrolment",
+      "expected_travel",
+      "break_glass_usage",
+      "approved_maintenance_window"
+    ],
+    "action_vocabulary": [
+      "no_change",
+      "monitor",
+      "propose_scoped_exclusion",
+      "apply_scoped_exclusion",
+      "add_watchlist_exclusion",
+      "change_cadence",
+      "hold_for_baselining"
+    ]
+  },
+  "dispositions": [
+    {
+      "rule": "DET-002",
+      "week": "2026-W26",
+      "alert_count": 6,
+      "fp_count": 3,
+      "benign_cause": "corp_vpn_egress",
+      "action": "apply_scoped_exclusion"
+    },
+    {
+      "rule": "DET-002",
+      "week": "2026-W27",
+      "alert_count": 4,
+      "fp_count": 0,
+      "benign_cause": null,
+      "action": "no_change"
+    },
+    {
+      "rule": "DET-001",
+      "week": "2026-W26",
+      "alert_count": 5,
+      "fp_count": 2,
+      "benign_cause": "device_reenrolment",
+      "action": "propose_scoped_exclusion"
+    },
+    {
+      "rule": "DET-004",
+      "week": "2026-W26",
+      "alert_count": 7,
+      "fp_count": 4,
+      "benign_cause": "approved_pipeline_rotation",
+      "action": "add_watchlist_exclusion"
+    },
+    {
+      "rule": "DET-005",
+      "week": "2026-W26",
+      "alert_count": 3,
+      "fp_count": 1,
+      "benign_cause": "scheduled_admin_change",
+      "action": "propose_scoped_exclusion"
+    },
+    {
+      "rule": "DET-006",
+      "week": "2026-W26",
+      "alert_count": 9,
+      "fp_count": 5,
+      "benign_cause": "mobile_carrier_nat",
+      "action": "hold_for_baselining"
+    },
+    {
+      "rule": "DET-007",
+      "week": "2026-W26",
+      "alert_count": 12,
+      "fp_count": 0,
+      "benign_cause": null,
+      "action": "change_cadence"
+    },
+    {
+      "rule": "CP-DET-001",
+      "week": "2026-W26",
+      "alert_count": 4,
+      "fp_count": 2,
+      "benign_cause": "expected_travel",
+      "action": "propose_scoped_exclusion"
+    },
+    {
+      "rule": "CP-DET-003",
+      "week": "2026-W26",
+      "alert_count": 3,
+      "fp_count": 1,
+      "benign_cause": "break_glass_usage",
+      "action": "propose_scoped_exclusion"
+    },
+    {
+      "rule": "CP-DET-004",
+      "week": "2026-W26",
+      "alert_count": 5,
+      "fp_count": 3,
+      "benign_cause": "approved_pipeline_rotation",
+      "action": "add_watchlist_exclusion"
+    },
+    {
+      "rule": "CP-DET-006",
+      "week": "2026-W26",
+      "alert_count": 6,
+      "fp_count": 2,
+      "benign_cause": "approved_maintenance_window",
+      "action": "monitor"
+    },
+    {
+      "rule": "CP-DET-008",
+      "week": "2026-W26",
+      "alert_count": 1,
+      "fp_count": 0,
+      "benign_cause": null,
+      "action": "no_change"
+    }
+  ]
+}

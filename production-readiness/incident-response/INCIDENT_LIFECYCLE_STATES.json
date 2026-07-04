@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Incident Lifecycle States",
+  "description": "Machine-readable state model for the synthetic Azure Identity Threat Detection & SOAR Lab. All examples are fictional (contoso.com personas, TEST-NET documentation IP ranges); nothing has run against a production tenant. SLA values are the same four-band model enforced in code (src/incident_builder.py, SLA_MATRIX) and reported daily (output/daily_security_report.md). The worked reference incident is CP-INC-2001.",
+  "version": "1.0.0",
+  "generated": "2026-07",
+  "sla_note": "Per-state SLAs below are operational targets for time spent in that state. The overall acknowledge/resolve SLAs by severity (P1 ack 15m/resolve 4h; P2 30m/8h; P3 4h/72h; P4 24h/7d) are defined in SEVERITY_MODEL.md and the SLA_MATRIX; the two are consistent and must not drift.",
+  "roles": {
+    "SOAR": "Automated orchestration; performs only read-only, reversible, no-approval actions (page, ticket, enrich, and session revocation at Critical).",
+    "DRI": "Directly Responsible Individual; the single accountable owner of the incident end-to-end.",
+    "DRI + specialist on-call": "DRI approves and owns; networking/identity/platform on-call executes their scoped action."
+  },
+  "states": [
+    {
+      "state": "ALERT",
+      "order": 1,
+      "owner_role": "SOAR",
+      "entry_criteria": [
+        "A detection (DET-00x / CP-DET-00x) fires, or the correlation engine links multiple alerts into one incident (e.g. CP-DET-008).",
+        "Incident record does not yet exist or has just been created by the engine."
+      ],
+      "exit_criteria": [
+        "An accountable DRI has acknowledged the page.",
+        "The incident has an assigned ID and entities have been enriched (read-only).",
+        "Only reversible, no-approval automation has run (page, ticket, enrich; session revocation at Critical)."
+      ],
+      "sla": {
+        "target": "Page delivered and DRI acknowledgement within the severity acknowledge SLA (P1 15m, P2 30m, P3 4h, P4 24h).",
+        "escalation": "No acknowledgement within the ack SLA auto-escalates to secondary DRI, then team lead (P1)."
+      },
+      "cp_inc_2001_example": "10:40 correlated Critical incident raised (CP-DET-008); 10:41 DRI paged and acknowledged."
+    },
+    {
+      "state": "TRIAGE",
+      "order": 2,
+      "owner_role": "DRI",
+      "entry_criteria": [
+        "DRI has acknowledged and opened the incident and its enrichment comment.",
+        "AI triage briefing (output/ai/) is available to read as a first take."
+      ],
+      "exit_criteria": [
+        "Severity assigned per SEVERITY_MODEL.md (P1/P2/P3/P4).",
+        "Incident confirmed real, OR closed as a false positive with a recorded reason that feeds tuning.",
+        "AI briefing has been verified against raw evidence (model input is attacker-influenceable).",
+        "A least-destructive-first containment plan exists and scope-based escalations have been triggered."
+      ],
+      "sla": {
+        "target": "Complete triage within the first 15 minutes for P1 (first-15-minutes checklist); proportionally longer for lower severities.",
+        "escalation": "If triage cannot be completed solo within the window, pull in the secondary DRI."
+      },
+      "cp_inc_2001_example": "Privileged identity + high-privilege service principal + internet-exposed management port => unambiguous P1; network on-call and app owner engaged."
+    },
+    {
+      "state": "CONTAIN",
+      "order": 3,
+      "owner_role": "DRI + specialist on-call",
+      "entry_criteria": [
+        "Incident confirmed real with a severity and a containment plan.",
+        "Evidence-collection checklist is being worked (capture before rotate)."
+      ],
+      "exit_criteria": [
+        "Attacker can no longer act: no new tokens issued, no live internet-exposed surface, no usable attacker-added credential.",
+        "Every state-mutating action was approval-gated and snapshotted its prior state before executing.",
+        "Evidence captured before any credential rotation or rule revert."
+      ],
+      "sla": {
+        "target": "Begin containment within the first 30 minutes for P1 (first-30-minutes checklist); complete well inside the resolve SLA.",
+        "escalation": "Resolve SLA at 75% elapsed notifies the team lead."
+      },
+      "cp_inc_2001_example": "10:43 sessions revoked (auto); 10:52 NSG reverted; 11:04 SP credential removed and secrets rotated; 11:10 Owner grant removed and PIM role deactivated; 11:20 host JIT-locked."
+    },
+    {
+      "state": "ERADICATE",
+      "order": 4,
+      "owner_role": "DRI + specialist on-call",
+      "entry_criteria": [
+        "Blast radius is capped (CONTAIN exit criteria met).",
+        "Evidence for all touched entities has been preserved."
+      ],
+      "exit_criteria": [
+        "All attacker-introduced credentials, objects and configuration removed (added client secret, Owner grant, temporary NSG rule).",
+        "Every credential the attacker touched or could have touched is rotated.",
+        "Persistence hunt complete: re-enabling everything would not let the attacker back in.",
+        "If a new foothold is found, drop back to CONTAIN rather than advancing."
+      ],
+      "sla": {
+        "target": "Within the resolve SLA for the severity; no fixed sub-target because thoroughness governs, not the clock.",
+        "escalation": "Any newly discovered persistence re-opens CONTAIN and re-notifies the team lead."
+      },
+      "cp_inc_2001_example": "Attacker-added client secret on sp-infra-deploy removed and remaining secrets rotated from key vault; Owner assignment unwound; PIM role deactivated."
+    },
+    {
+      "state": "RECOVER",
+      "order": 5,
+      "owner_role": "DRI + specialist on-call",
+      "entry_criteria": [
+        "Foothold removed (ERADICATE exit criteria met).",
+        "A known-good baseline for affected services is identified."
+      ],
+      "exit_criteria": [
+        "Affected services restored to a known-good state and business owner confirms normal operation.",
+        "Verification passes: detections re-run over the post-containment window return silent; no new tokens post-revocation; no successful inbound login to the exposed endpoint; no residual unexpected SP credentials.",
+        "Affected identity restored with phishing-resistant MFA and a password reset."
+      ],
+      "sla": {
+        "target": "Complete recovery and verification within the resolve SLA for the severity.",
+        "escalation": "Failed verification returns the incident to ERADICATE (or CONTAIN if a live foothold reappears)."
+      },
+      "cp_inc_2001_example": "Confirmed no successful RDP login reached vm-dc-mgmt-01; NSG free of any internet-wide management rule; chris.walker@contoso.com restored with phishing-resistant MFA."
+    },
+    {
+      "state": "CLOSE",
+      "order": 6,
+      "owner_role": "DRI",
+      "entry_criteria": [
+        "Services recovered and all verification checks passed.",
+        "Resolution note prepared."
+      ],
+      "exit_criteria": [
+        "Blameless RCA task raised (full RCA due within five business days).",
+        "Resolution note issued to the incident channel and stakeholders.",
+        "Action items recorded with a single owner and a due date each.",
+        "SLA outcome (acknowledge and resolve) recorded for the weekly operations review; any breach carries a reason."
+      ],
+      "sla": {
+        "target": "Close once verification is complete and the RCA task exists; full RCA written within five business days.",
+        "escalation": "SLA breaches and false-positive closes are surfaced at the weekly operations review."
+      },
+      "cp_inc_2001_example": "Incident closed after verification; blameless RCA raised with five owned, dated action items (see RCA_PROCESS.md)."
+    }
+  ],
+  "transitions": [
+    { "from": "ALERT", "to": "TRIAGE", "on": "DRI acknowledges and opens the incident" },
+    { "from": "TRIAGE", "to": "CONTAIN", "on": "Severity set and incident confirmed real" },
+    { "from": "TRIAGE", "to": "CLOSE", "on": "Confirmed false positive (reason recorded, feeds tuning)" },
+    { "from": "CONTAIN", "to": "ERADICATE", "on": "Attacker can no longer act; blast radius capped" },
+    { "from": "ERADICATE", "to": "RECOVER", "on": "Foothold and attacker artefacts removed" },
+    { "from": "ERADICATE", "to": "CONTAIN", "on": "New foothold discovered (reversible under evidence)" },
+    { "from": "RECOVER", "to": "CLOSE", "on": "Services restored and verification passes" },
+    { "from": "RECOVER", "to": "ERADICATE", "on": "Verification fails (environment not clean)" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "_comment": "Illustrative, synthetic on-call rota. Fictional personas (@contoso.com) only. Not a real roster and not integrated with any paging system.",
+  "timezone_regions": ["Australia/Sydney", "Europe/Amsterdam"],
+  "rotation": "weekly, follow-the-sun handover at region change",
+  "roster": [
+    {"week": "2026-W27", "region": "Australia/Sydney", "primary": "lena.novak@contoso.com", "secondary": "tom.becker@contoso.com", "incident_commander": "daniel.wright@contoso.com", "comms_owner": "grace.kim@contoso.com"},
+    {"week": "2026-W27", "region": "Europe/Amsterdam", "primary": "tom.becker@contoso.com", "secondary": "lena.novak@contoso.com", "incident_commander": "daniel.wright@contoso.com", "comms_owner": "grace.kim@contoso.com"},
+    {"week": "2026-W28", "region": "Australia/Sydney", "primary": "tom.becker@contoso.com", "secondary": "lena.novak@contoso.com", "incident_commander": "daniel.wright@contoso.com", "comms_owner": "grace.kim@contoso.com"},
+    {"week": "2026-W28", "region": "Europe/Amsterdam", "primary": "lena.novak@contoso.com", "secondary": "tom.becker@contoso.com", "incident_commander": "daniel.wright@contoso.com", "comms_owner": "grace.kim@contoso.com"},
+    {"week": "2026-W29", "region": "Australia/Sydney", "primary": "lena.novak@contoso.com", "secondary": "ravi.menon@contoso.com", "incident_commander": "daniel.wright@contoso.com", "comms_owner": "grace.kim@contoso.com"},
+    {"week": "2026-W29", "region": "Europe/Amsterdam", "primary": "ravi.menon@contoso.com", "secondary": "lena.novak@contoso.com", "incident_commander": "daniel.wright@contoso.com", "comms_owner": "grace.kim@contoso.com"}
+  ],
+  "escalation_contacts": {
+    "network_oncall": "felix.nguyen@contoso.com",
+    "cloud_platform": "priya.sharma@contoso.com",
+    "detection_engineering": "ravi.menon@contoso.com",
+    "secops_lead": "amara.okafor@contoso.com"
+  },
+  "ack_sla_minutes": {"P1": 15, "P2": 30, "P3": 240, "P4": 1440}
+}

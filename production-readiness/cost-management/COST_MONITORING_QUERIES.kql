@@ -1,0 +1,224 @@
+// =====================================================================
+// Microsoft Sentinel / Log Analytics - Cost Monitoring Queries
+// =====================================================================
+//
+// LAB, ILLUSTRATIVE. This project is an offline-first, synthetic
+// Sentinel-style lab (see README.md). These queries are written against
+// the standard Log Analytics `Usage` table and are SAFE and READ-ONLY:
+// they only summarise ingestion volume - they never modify, purge, or
+// export data. Thresholds are illustrative and align with
+// INGESTION_BUDGET.md; tune them to your own workspace before use.
+//
+// The `Usage` table is the canonical source for ingestion cost analysis.
+// Key columns used below:
+//   TimeGenerated  - when the usage record was emitted
+//   DataType       - the table/stream the usage belongs to (e.g. SigninLogs)
+//   Quantity       - volume in the unit given by QuantityUnit (MBytes here)
+//   QuantityUnit   - unit of Quantity (expected "MBytes")
+//   IsBillable     - whether the ingestion is billable
+//   Solution       - the solution the data type belongs to
+//
+// Convention: Quantity is in MB; divide by 1024 for GB. Filter
+// QuantityUnit == "MBytes" defensively so unit changes never skew maths.
+//
+// =====================================================================
+
+
+// ---------------------------------------------------------------------
+// 1. Data volume by table (last 30 days)
+//    "Which tables cost the most?" - the starting point for every review.
+// ---------------------------------------------------------------------
+Usage
+| where TimeGenerated > ago(30d)
+| where QuantityUnit == "MBytes"
+| summarize BillableGB = round(sum(iff(IsBillable == true, Quantity, 0.0)) / 1024, 2),
+            TotalGB    = round(sum(Quantity) / 1024, 2)
+        by DataType
+| extend NonBillableGB = round(TotalGB - BillableGB, 2)
+| sort by BillableGB desc
+
+
+// ---------------------------------------------------------------------
+// 2. Ingestion by day (workspace total, last 30 days)
+//    Trend line for the daily review; feeds the "daily spike" alert.
+// ---------------------------------------------------------------------
+Usage
+| where TimeGenerated > ago(30d)
+| where QuantityUnit == "MBytes"
+| summarize TotalGB = round(sum(Quantity) / 1024, 2) by Day = bin(TimeGenerated, 1d)
+| sort by Day asc
+
+
+// ---------------------------------------------------------------------
+// 3. Ingestion by day, per table (last 14 days)
+//    Spot which specific table moved on a day the total jumped.
+// ---------------------------------------------------------------------
+Usage
+| where TimeGenerated > ago(14d)
+| where QuantityUnit == "MBytes"
+| summarize GB = round(sum(Quantity) / 1024, 2) by Day = bin(TimeGenerated, 1d), DataType
+| sort by Day asc, GB desc
+
+
+// ---------------------------------------------------------------------
+// 4. Top noisy tables (last 7 days, ranked, with share of total)
+//    "Noisy" = large share of volume. Cross-check against detection use
+//    (query 8) to find volume that earns no security value.
+// ---------------------------------------------------------------------
+let lookback = 7d;
+let totals =
+    Usage
+    | where TimeGenerated > ago(lookback)
+    | where QuantityUnit == "MBytes"
+    | summarize WorkspaceGB = sum(Quantity) / 1024;
+Usage
+| where TimeGenerated > ago(lookback)
+| where QuantityUnit == "MBytes"
+| summarize TableGB = sum(Quantity) / 1024 by DataType
+| extend WorkspaceGB = toscalar(totals)
+| extend PctOfTotal = round(100.0 * TableGB / WorkspaceGB, 1)
+| project DataType, TableGB = round(TableGB, 2), PctOfTotal
+| sort by TableGB desc
+| take 15
+
+
+// ---------------------------------------------------------------------
+// 5. Daily spike detector (yesterday vs trailing 7-day average)
+//    Illustrative alert: fire when yesterday is >25% above the average.
+//    Basis for the "Workspace daily spike" trigger in INGESTION_BUDGET.md.
+// ---------------------------------------------------------------------
+let spike_factor = 1.25;   // 25% above the trailing average
+let daily =
+    Usage
+    | where TimeGenerated > ago(8d)
+    | where QuantityUnit == "MBytes"
+    | summarize GB = sum(Quantity) / 1024 by Day = bin(TimeGenerated, 1d);
+let yesterday =
+    toscalar(daily | where Day == bin(ago(1d), 1d) | summarize sum(GB));
+let baseline =
+    toscalar(daily | where Day < bin(ago(1d), 1d) | summarize avg(GB));
+print YesterdayGB      = round(yesterday, 2),
+      Trailing7dAvgGB  = round(baseline, 2),
+      Threshold        = round(baseline * spike_factor, 2),
+      SpikeDetected    = yesterday > baseline * spike_factor
+
+
+// ---------------------------------------------------------------------
+// 6. Per-table budget breach (yesterday vs illustrative hard thresholds)
+//    Thresholds mirror the "Hard (alert)" column in INGESTION_BUDGET.md.
+//    Edit the datatable to match your own budget.
+// ---------------------------------------------------------------------
+let hard_thresholds = datatable(DataType:string, HardGB:real)
+[
+    "SigninLogs",       4.5,
+    "AuditLogs",        2.0,
+    "AzureActivity",    4.0,
+    "CyberArk_EPV_CL",  0.8,
+    "SecurityEvent",   14.0,
+    "Syslog",          12.0
+];
+Usage
+| where TimeGenerated between (bin(ago(1d), 1d) .. bin(now(), 1d))
+| where QuantityUnit == "MBytes"
+| summarize YesterdayGB = round(sum(Quantity) / 1024, 2) by DataType
+| join kind=inner hard_thresholds on DataType
+| extend Breached = YesterdayGB > HardGB
+| where Breached
+| project DataType, YesterdayGB, HardGB, Breached
+| sort by YesterdayGB desc
+
+
+// ---------------------------------------------------------------------
+// 7. Unexpected new tables (appeared in last 3d, absent in prior 30d)
+//    Catches connectors switched on without a budget line.
+// ---------------------------------------------------------------------
+let recent =
+    Usage
+    | where TimeGenerated > ago(3d)
+    | where QuantityUnit == "MBytes"
+    | distinct DataType;
+let historical =
+    Usage
+    | where TimeGenerated between (ago(33d) .. ago(3d))
+    | where QuantityUnit == "MBytes"
+    | distinct DataType;
+recent
+| join kind=leftanti historical on DataType
+| project NewDataType = DataType
+
+
+// ---------------------------------------------------------------------
+// 8. Tables with volume but (illustratively) no detection coverage
+//    Starting point for "am I paying to ingest data nothing detects on?".
+//    The lab's rules read the tables listed in `detected_tables`; edit
+//    this list to reflect the tables your analytics rules actually query.
+// ---------------------------------------------------------------------
+let detected_tables = dynamic([
+    "SigninLogs", "AuditLogs", "AzureActivity", "CyberArk_EPV_CL"
+]);
+Usage
+| where TimeGenerated > ago(7d)
+| where QuantityUnit == "MBytes"
+| summarize GB = round(sum(Quantity) / 1024, 2) by DataType
+| where GB > 0.5                              // ignore trivial tables
+| where DataType !in (detected_tables)
+| sort by GB desc
+
+
+// ---------------------------------------------------------------------
+// 9. Billable vs non-billable split (last 30 days)
+//    Confirms how much of your volume is actually charged.
+// ---------------------------------------------------------------------
+Usage
+| where TimeGenerated > ago(30d)
+| where QuantityUnit == "MBytes"
+| summarize GB = round(sum(Quantity) / 1024, 2) by IsBillable
+| sort by GB desc
+
+
+// ---------------------------------------------------------------------
+// 10. Volume by Sentinel solution (last 30 days)
+//     Attributes cost to solutions/connectors, not just raw tables.
+// ---------------------------------------------------------------------
+Usage
+| where TimeGenerated > ago(30d)
+| where QuantityUnit == "MBytes"
+| summarize GB = round(sum(Quantity) / 1024, 2) by Solution
+| sort by GB desc
+
+
+// ---------------------------------------------------------------------
+// 11. Cost investigation starting point - illustrative monthly A$ estimate
+//     Multiplies volume by an ILLUSTRATIVE per-GB rate. This is a planning
+//     estimate, NOT a bill. Set `rate_aud_per_gb` to your own tier rate;
+//     for real cost use Azure Cost Management, not this query.
+// ---------------------------------------------------------------------
+let rate_aud_per_gb = 4.00;   // illustrative Analytics-tier AUD rate
+Usage
+| where TimeGenerated > ago(30d)
+| where QuantityUnit == "MBytes"
+| where IsBillable == true
+| summarize BillableGB = sum(Quantity) / 1024 by DataType
+| extend EstMonthlyAUD = round(BillableGB * rate_aud_per_gb, 2)
+| project DataType,
+          BillableGB = round(BillableGB, 2),
+          EstMonthlyAUD
+| sort by EstMonthlyAUD desc
+
+
+// ---------------------------------------------------------------------
+// 12. Approaching the daily cap (running total for the current UTC day)
+//     Illustrative: warn at >80% of a 30 GB/day cap (production example).
+//     For the lab the cap is 1 GB/day - set cap_gb accordingly.
+// ---------------------------------------------------------------------
+let cap_gb = 30.0;            // illustrative production cap; lab = 1.0
+let warn_fraction = 0.80;
+Usage
+| where TimeGenerated > startofday(now())
+| where QuantityUnit == "MBytes"
+| summarize RunningGB = sum(Quantity) / 1024
+| extend CapGB = cap_gb,
+         WarnAtGB = round(cap_gb * warn_fraction, 2),
+         PctOfCap = round(100.0 * (RunningGB / cap_gb), 1)
+| extend ApproachingCap = RunningGB > cap_gb * warn_fraction
+| project RunningGB = round(RunningGB, 2), CapGB, WarnAtGB, PctOfCap, ApproachingCap

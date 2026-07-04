@@ -1,0 +1,21 @@
+{
+  "_comment": "Illustrative, synthetic playbook test results from lab execution against synthetic resources only. Not real runs against a live tenant.",
+  "run_date": "2026-07-04",
+  "environment": "lab (synthetic)",
+  "results": [
+    {"playbook": "enrich-alert", "test_case": "E1", "expected": "context + blast radius attached", "result": "pass", "automation_level": "automatic"},
+    {"playbook": "enrich-alert", "test_case": "E3", "expected": "read-only, no state change", "result": "pass", "automation_level": "automatic"},
+    {"playbook": "notify-dri", "test_case": "N1", "expected": "card + page on P1", "result": "pass", "automation_level": "automatic"},
+    {"playbook": "notify-dri", "test_case": "N3", "expected": "no secrets in payload", "result": "pass", "automation_level": "automatic"},
+    {"playbook": "revoke-sessions", "test_case": "S1", "expected": "unattended revoke at Critical", "result": "pass", "automation_level": "automatic"},
+    {"playbook": "revoke-sessions", "test_case": "S2", "expected": "approval gate at High", "result": "pass", "automation_level": "approval required"},
+    {"playbook": "revoke-sessions", "test_case": "S3", "expected": "user re-auth, no lockout", "result": "pass", "automation_level": "automatic"},
+    {"playbook": "rotate-sp-credential", "test_case": "C1", "expected": "approval then remove attacker credential", "result": "pass", "automation_level": "approval required"},
+    {"playbook": "rotate-sp-credential", "test_case": "C3", "expected": "snapshot before removal", "result": "pass", "automation_level": "approval required"},
+    {"playbook": "revert-nsg-rule", "test_case": "R1", "expected": "snapshot + approval + revert", "result": "pass", "automation_level": "approval required"},
+    {"playbook": "revert-nsg-rule", "test_case": "R3", "expected": "rollback re-applies snapshot", "result": "pass", "automation_level": "approval required"},
+    {"playbook": "isolate-vm", "test_case": "V1", "expected": "approval then JIT-lock/isolate", "result": "pass", "automation_level": "approval required"},
+    {"playbook": "isolate-vm", "test_case": "V3", "expected": "restore after clean", "result": "pass", "automation_level": "approval required"}
+  ],
+  "summary": {"total": 13, "passed": 13, "failed": 0, "note": "Lab-only results demonstrating automation-level behaviour and safety gating; not evidence of production readiness."}
+}
