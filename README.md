@@ -6,7 +6,7 @@ engineering, incident correlation, SOAR design, AI-assisted triage, and SecOps
 metrics.
 
 ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
-![Tests 37 passing](https://img.shields.io/badge/tests-37%20passing-success)
+![Tests 55 passing](https://img.shields.io/badge/tests-55%20passing-success)
 ![Offline first](https://img.shields.io/badge/mode-offline--first-success)
 ![MITRE ATT&CK mapped](https://img.shields.io/badge/MITRE%20ATT%26CK-mapped-red)
 ![License MIT](https://img.shields.io/badge/license-MIT-green)
@@ -103,23 +103,30 @@ production experience and what is demonstrated in this lab.
 
 ```mermaid
 flowchart LR
-    A["Synthetic telemetry"] --> B["Detections"]
-    B --> C["Alerts"]
-    C --> D["Correlation"]
-    D --> E["Incidents"]
-    E --> F["AI triage"]
-    F --> G["SOAR playbooks"]
-    E --> H["Metrics / reporting"]
+    A["Synthetic telemetry"] --> B["KQL / YAML detections"]
+    B --> C["Python detection mirror"]
+    C --> D["Alerts"]
+    D --> E["Correlation"]
+    E --> F["Incidents"]
+    F --> G["AI triage"]
+    G --> H["SOAR playbooks"]
+    F --> I["Metrics / reporting"]
+    I --> J["Production-readiness controls"]
 ```
 
-Detections are written as KQL, mirrored as a tested Python engine, and shipped
-through an Azure DevOps pipeline (validate, test, package, approval-gated
-deploy) - see [Detection-as-code and CI](#detection-as-code-and-ci) below.
+Detections are written as KQL and version-controlled YAML, mirrored as a tested
+Python engine, and shipped through an Azure DevOps pipeline (validate, test,
+package, approval-gated deploy) - see
+[Detection-as-code and CI](#detection-as-code-and-ci) below. The
+[production-readiness controls](production-readiness/README.md) wrap the whole
+flow with the operational discipline (tuning, change approval, RBAC, cost, DRI)
+that a real deployment would require.
 
 ## Demo in 5 minutes
 
 ```bash
-cd "/Users/mayank/Microsoft sentinel project/azure-identity-soar-lab"
+git clone https://github.com/Mayankv2001/azure-identity-soar-lab.git
+cd azure-identity-soar-lab
 python3 src/main.py --demo
 ```
 
@@ -147,7 +154,7 @@ Tests and validation (dev dependencies only):
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python3 -m pytest -q        # 37 tests across both labs and the engineering layer
+python3 -m pytest -q        # 55 tests across labs, deployment artifacts and production-readiness layer
 ```
 
 ## Detection coverage
@@ -248,8 +255,11 @@ Full write-up: [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md).
 Stated honestly, because a security engineer should be able to describe the
 boundaries of their own system:
 
-- This is a **local simulation** - Sentinel-style, not a production Microsoft
-  Sentinel deployment. The Azure path (Mode B) is documented, not deployed.
+- This is **offline-first and Sentinel-style**, not a production deployment.
+  **Mode B** is the documented CI/CD promotion pattern (how detections would
+  reach a workspace). **Mode C** is an optional live lab deployment path that
+  *was* run in a personal/test Azure subscription (workspace, Sentinel
+  onboarding, and the disabled `[LAB] DET-001` rule) - a lab, not production.
 - All telemetry is **synthetic** and shaped for clarity; real environments are
   noisier and the thresholds here would need baselining and tuning.
 - The detections are **educational reference implementations** - production
@@ -257,6 +267,10 @@ boundaries of their own system:
   coverage, and ingestion-cost engineering.
 - The AI component defaults to a deterministic offline template; the Azure
   OpenAI mode is optional and untested at scale.
+- **Reaching production** would still require real telemetry, tuning against
+  real noise, an RBAC review, a cost review, change approval, and ongoing
+  operations - the controls documented in the
+  [production-readiness layer](production-readiness/README.md).
 
 ## Safe to share
 
@@ -293,8 +307,12 @@ azure-identity-soar-lab/
 │   ├── ai_assistant.py                bounded AI briefings (offline / Azure OpenAI)
 │   ├── reporting.py                   daily operations report
 │   └── export_demo_outputs.py         regenerates demo-output/
-└── tests/
-    └── test_detection_engine.py       17 tests incl. detection-as-code contract
+├── modules/datacenter-control-plane/  advanced extension: identity-to-cloud attack path (8 detections)
+├── security-engineering/              detection scorecard, purple-team pack, attack-path graph, incident packet
+├── production-readiness/              lab-vs-production operations layer (telemetry, connectors, IR, tuning, RBAC, cost, DRI, maintenance) + scorecard
+├── infra/sentinel/                    Mode C Bicep: lab Log Analytics + Sentinel + disabled [LAB] DET-001 rule
+├── scripts/sentinel/                  Mode C deploy / validate / verify scripts (personal/test subscription only)
+└── tests/                             55 tests across labs, deployment artifacts and production-readiness
 ```
 
 ## Mode B: deploying to Azure (documented path)
@@ -309,9 +327,13 @@ stage and playbooks as Logic Apps.
 
 ## Optional live Sentinel deployment path (Mode C, lab only)
 
-Offline mode is the default. **Mode C** is an optional, lab-only path that can
-actually deploy into a real Microsoft Sentinel workspace using Bicep and Azure
-CLI - in a **personal/test subscription only**.
+Offline mode is the default. **Mode C** is an optional path that deploys into a
+real Microsoft Sentinel workspace using Bicep and Azure CLI - in a
+**personal/test subscription only**. This path *was* run as a lab: a Log
+Analytics workspace, Sentinel onboarding, and the custom scheduled analytics rule
+**`[LAB] DET-001 MFA Fatigue`** were deployed, with the **rule disabled by
+default** and **no destructive automation**. That is a lab deployment - **not
+production**.
 
 - Deploys a lab Log Analytics workspace (30-day retention), Sentinel onboarding,
   and a sample scheduled analytics rule (DET-001), **disabled by default**.
@@ -319,7 +341,9 @@ CLI - in a **personal/test subscription only**.
   disabled Logic App playbook skeleton.
 - **No destructive playbooks, no secrets, no tenant/subscription IDs** in the
   repo. Not production-ready - the rules require tenant-specific tuning, cost
-  review, and change-control approval first.
+  review, and change-control approval first (see the
+  [production-readiness layer](production-readiness/README.md) and its
+  [scorecard](production-readiness/reports/PRODUCTION_READINESS_SCORECARD.md)).
 
 Details: [docs/LIVE_SENTINEL_DEPLOYMENT_PATH.md](docs/LIVE_SENTINEL_DEPLOYMENT_PATH.md)
 | Infrastructure: [infra/sentinel/](infra/sentinel/)
