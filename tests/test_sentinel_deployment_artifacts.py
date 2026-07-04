@@ -119,3 +119,37 @@ def test_default_deployment_is_lab_scoped():
     assert "param enableAnalyticsRule bool = false" in main
     assert "param deployAutomationRules bool = false" in main
     assert "param deployPlaybook bool = false" in main
+
+
+def test_analytics_rule_is_workspace_scoped_extension_resource():
+    """The rule must be an extension resource on the workspace (scope: workspace),
+    which compiles to the child path
+    workspaces/<name>/providers/Microsoft.SecurityInsights/alertRules/<guid>."""
+    rule = (INFRA / "modules" / "analytics-rule.bicep").read_text(encoding="utf-8")
+    assert "Microsoft.SecurityInsights/alertRules@" in rule
+    assert "scope: workspace" in rule
+    assert "kind: 'Scheduled'" in rule
+    # Deterministic name via guid().
+    assert "guid(" in rule
+
+
+def test_main_exposes_rule_resource_id_output_for_verification():
+    main = (INFRA / "main.bicep").read_text(encoding="utf-8")
+    assert "output analyticsRuleResourceId string" in main
+
+
+def test_verification_does_not_rely_on_az_resource_list():
+    """Regression guard: `az resource list` cannot see Sentinel alert rules, so
+    the deploy script and docs must verify via az rest / az sentinel instead and
+    warn about it."""
+    deploy = DEPLOY_SCRIPT.read_text(encoding="utf-8")
+    assert "az rest" in deploy, "deploy script must verify rule via az rest"
+    assert "az resource list" in deploy and "cannot see" in deploy.lower(), \
+        "deploy script must warn that az resource list cannot see Sentinel rules"
+    # Deploy passes deployAnalyticsRules explicitly to remove ambiguity.
+    assert "deployAnalyticsRules=true" in deploy
+    doc = DEPLOY_DOC.read_text(encoding="utf-8")
+    assert "SecurityInsights/alertRules?api-version=" in doc
+    # The doc must warn against az resource list for Sentinel verification.
+    assert "az resource list" in doc
+    assert "extension resource" in doc.lower()

@@ -118,5 +118,10 @@ output resourceGroupName string = resourceGroup().name
 output sentinelOnboarded bool = true
 output analyticsRuleDeployed bool = deployAnalyticsRules
 output analyticsRuleEnabled bool = deployAnalyticsRules ? enableAnalyticsRule : false
+// Definitive proof-of-creation for the analytics rule. Sentinel alert rules are
+// extension resources that do NOT appear in `az resource list`; inspect this
+// deployment output instead:
+//   az deployment group show -g <rg> -n <deploymentName> --query properties.outputs.analyticsRuleResourceId.value -o tsv
+output analyticsRuleResourceId string = analyticsRule.?outputs.ruleId ?? ''
 output automationRuleDeployed bool = deployAutomationRules
 output playbookDeployed bool = deployPlaybook

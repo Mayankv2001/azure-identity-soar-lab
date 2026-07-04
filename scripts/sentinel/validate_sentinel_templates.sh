@@ -45,7 +45,7 @@ echo "== Validating deployment (no resources are created) =="
 az deployment group validate \
   --resource-group "${RESOURCE_GROUP}" \
   --template-file "${TEMPLATE}" \
-  --parameters workspaceName="${WORKSPACE_NAME}" location="${LOCATION}" \
+  --parameters workspaceName="${WORKSPACE_NAME}" location="${LOCATION}" deployAnalyticsRules=true \
   -o table
 
 echo

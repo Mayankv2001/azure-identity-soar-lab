@@ -72,12 +72,41 @@ personal/test subscription before creating anything.
 
 ## 6. Validation (after deploy)
 
+> **Do not verify Sentinel resources with `az resource list`.** Microsoft
+> Sentinel analytics rules (and the onboarding state) are **extension resources**
+> under the `Microsoft.SecurityInsights` provider. They are **not** returned by
+> `az resource list` or by `az resource list --resource-type
+> "Microsoft.SecurityInsights/alertRules"` - that command shows nothing **even
+> when the rule exists**. This is the single most common "my rule didn't deploy"
+> false alarm.
+
+Verify the analytics rule with **one** of these instead:
+
+```bash
+# A) Deployment output (definitive proof the rule resource was created)
+az deployment group show \
+  --resource-group "$RESOURCE_GROUP" \
+  --name "<deployment-name-printed-by-the-deploy-script>" \
+  --query properties.outputs.analyticsRuleResourceId.value -o tsv
+
+# B) SecurityInsights REST API (lists the rules on the workspace)
+SUB_ID="$(az account show --query id -o tsv)"
+az rest --method get \
+  --url "https://management.azure.com/subscriptions/$SUB_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.OperationalInsights/workspaces/$WORKSPACE_NAME/providers/Microsoft.SecurityInsights/alertRules?api-version=2023-11-01" \
+  --query "value[].{name:properties.displayName, enabled:properties.enabled, severity:properties.severity}" -o table
+
+# C) Sentinel CLI extension
+az extension add --name sentinel 2>/dev/null || true
+az sentinel alert-rule list -g "$RESOURCE_GROUP" -w "$WORKSPACE_NAME" -o table
+```
+
+Expected: `[LAB] DET-001 MFA Fatigue (Push Bombing)`, `enabled=false`,
+`severity=High`.
+
 In the Azure Portal:
 
-- **Resource groups** > your resource group > confirm the workspace exists
-- **Microsoft Sentinel** > select the workspace
-- **Analytics** > confirm `[LAB] DET-001 MFA Fatigue (Push Bombing)` exists and
-  is **Disabled** (unless you deployed with `ENABLE_ANALYTICS_RULE=true`)
+- **Microsoft Sentinel** > select the workspace > **Analytics** > confirm the
+  rule exists under **Active rules** (it will be toggled off / disabled)
 - **Log Analytics workspace** > Usage and estimated costs > watch ingestion
 
 Read-only CLI checks are documented in

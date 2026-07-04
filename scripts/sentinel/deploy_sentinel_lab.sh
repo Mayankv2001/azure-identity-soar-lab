@@ -69,6 +69,8 @@ fi
 echo "== Creating resource group (if missing) =="
 az group create --name "${RESOURCE_GROUP}" --location "${LOCATION}" -o none
 
+DEPLOYMENT_NAME="sentinel-lab-$(date +%Y%m%d%H%M%S)"
+
 echo "== Validating template (no resources created yet) =="
 az deployment group validate \
   --resource-group "${RESOURCE_GROUP}" \
@@ -76,6 +78,7 @@ az deployment group validate \
   --parameters \
       workspaceName="${WORKSPACE_NAME}" \
       location="${LOCATION}" \
+      deployAnalyticsRules=true \
       enableAnalyticsRule="${ENABLE_ANALYTICS_RULE}" \
       deployAutomationRules="${DEPLOY_AUTOMATION_RULE}" \
       deployPlaybook="${DEPLOY_PLAYBOOK}" \
@@ -85,15 +88,36 @@ echo "Validation passed."
 echo "== Deploying =="
 az deployment group create \
   --resource-group "${RESOURCE_GROUP}" \
-  --name "sentinel-lab-$(date +%Y%m%d%H%M%S)" \
+  --name "${DEPLOYMENT_NAME}" \
   --template-file "${TEMPLATE}" \
   --parameters \
       workspaceName="${WORKSPACE_NAME}" \
       location="${LOCATION}" \
+      deployAnalyticsRules=true \
       enableAnalyticsRule="${ENABLE_ANALYTICS_RULE}" \
       deployAutomationRules="${DEPLOY_AUTOMATION_RULE}" \
       deployPlaybook="${DEPLOY_PLAYBOOK}" \
   -o table
+
+# --- Self-verify the analytics rule ----------------------------------------
+# IMPORTANT: Microsoft Sentinel alert rules are EXTENSION resources under the
+# SecurityInsights provider. They do NOT appear in `az resource list` (nor with
+# --resource-type Microsoft.SecurityInsights/alertRules). Verify via the
+# deployment output and the SecurityInsights REST API instead.
+echo
+echo "== Verifying the analytics rule (az resource list cannot see Sentinel rules) =="
+RULE_ID="$(az deployment group show \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${DEPLOYMENT_NAME}" \
+  --query "properties.outputs.analyticsRuleResourceId.value" -o tsv 2>/dev/null || true)"
+echo "Deployment output analyticsRuleResourceId: ${RULE_ID:-<empty>}"
+
+SUB_ID="$(az account show --query id -o tsv)"
+echo "Alert rules currently on the workspace:"
+az rest --method get \
+  --url "https://management.azure.com/subscriptions/${SUB_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.OperationalInsights/workspaces/${WORKSPACE_NAME}/providers/Microsoft.SecurityInsights/alertRules?api-version=2023-11-01" \
+  --query "value[].{name:properties.displayName, enabled:properties.enabled, severity:properties.severity, kind:kind}" \
+  -o table || echo "  (could not query alert rules - check permissions / api-version)"
 
 echo
 echo "=============================================================="
@@ -101,11 +125,17 @@ echo "  DEPLOYMENT COMPLETE (lab)"
 echo "=============================================================="
 echo "Resource group:  ${RESOURCE_GROUP}"
 echo "Workspace:       ${WORKSPACE_NAME}"
+echo "Deployment:      ${DEPLOYMENT_NAME}"
 echo
-echo "Next steps:"
-echo "  - Azure Portal > Microsoft Sentinel > select the workspace"
-echo "  - Analytics > confirm '[LAB] DET-001 ...' exists and is DISABLED"
-echo "  - The analytics rule is disabled unless you set ENABLE_ANALYTICS_RULE=true"
+echo "To re-verify the rule later (do NOT use 'az resource list' - it cannot see"
+echo "Sentinel rules). Use ONE of:"
+echo "  az sentinel alert-rule list -g \"${RESOURCE_GROUP}\" -w \"${WORKSPACE_NAME}\" -o table"
+echo "     (needs: az extension add --name sentinel)"
+echo "  az deployment group show -g \"${RESOURCE_GROUP}\" -n \"${DEPLOYMENT_NAME}\" \\"
+echo "     --query properties.outputs.analyticsRuleResourceId.value -o tsv"
+echo "  Azure Portal > Microsoft Sentinel > ${WORKSPACE_NAME} > Analytics"
+echo
+echo "The rule is DISABLED unless you set ENABLE_ANALYTICS_RULE=true."
 echo
 echo "COST CONTROL: delete everything when done:"
 echo "  az group delete --name \"${RESOURCE_GROUP}\" --yes --no-wait"

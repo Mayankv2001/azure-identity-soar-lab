@@ -21,6 +21,10 @@
 #        --ids "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.OperationalInsights/workspaces/$WORKSPACE_NAME/providers/Microsoft.SecurityInsights/onboardingStates/default" \
 #        -o table
 #
+# NOTE: `az resource list` does NOT show Sentinel resources (onboarding state,
+# alert rules, automation rules) - they are extension resources under the
+# Microsoft.SecurityInsights provider. Use the REST API or `az sentinel` instead.
+#
 # 4. The sample analytics rule exists (via the Sentinel REST API through az):
 #      az rest --method get \
 #        --url "https://management.azure.com/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.OperationalInsights/workspaces/$WORKSPACE_NAME/providers/Microsoft.SecurityInsights/alertRules?api-version=2023-11-01" \
