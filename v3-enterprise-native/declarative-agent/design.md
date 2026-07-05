@@ -1,8 +1,29 @@
 # Declarative Agent — design
 
 V2 described a generic "custom agent" with a single custom MCP server. V3 moves to
-a **Declarative Agent** (the first-party Microsoft 365 / Security Copilot agent
-format) that leans on native servers and keeps only the irreducible custom piece.
+a declarative manifest that leans on native servers and keeps only the
+irreducible custom piece.
+
+## Which Copilot: Security Copilot, not M365 Copilot
+
+This agent and its MCP plugin are built for **Microsoft Security Copilot** - the
+standalone SOC portal (securitycopilot.microsoft.com) used by SOC analysts and
+DRIs - **not** a generic **Microsoft 365 Copilot** declarative agent that a
+knowledge worker invokes in Teams, Word or Outlook. The distinction matters:
+
+| | Microsoft Security Copilot | Microsoft 365 Copilot declarative agent |
+|---|----------------------------|------------------------------------------|
+| Surface | Standalone SOC portal, embedded in Defender/Sentinel | Teams / Word / Outlook / M365 chat |
+| Persona | SOC analyst, DRI, threat hunter | Knowledge worker |
+| Grounding | Security graph, incidents, hunting, threat intel | Graph connectors, SharePoint, web |
+| Purpose | Investigate and respond to incidents | Productivity and content |
+
+The extensibility models are **converging** - both increasingly use the same
+building blocks (declarative manifests, MCP servers and plugins), which is why
+this manifest reuses the declarative-agent schema and the `target_platform` field
+names the intended runtime explicitly. But the **audience and runtime are the
+Security Operations Center**, not end-user productivity, and the plugin's tools,
+grounding and guardrails are designed for that persona.
 
 ## What changed from V2
 

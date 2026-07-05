@@ -56,6 +56,22 @@ path *inside* Log Analytics - no external compute, no glue code, and it composes
 with every other analytics rule. I keep the Python version only as a readable
 reference; the native KQL is the go-forward.
 
+**Sentinel Graph vs the Defender XDR unified graph.** One nuance a modern SOC
+would flag: Microsoft Sentinel and Microsoft Defender XDR have merged into the
+**Unified Security Operations Platform**, so where I query graph data matters.
+I used `make-graph` here because the attack path traverses **custom lab
+telemetry** (the synthetic CyberArk safe, the NSG/asset watchlist) that only
+exists in my Log Analytics tables - `make-graph` is exactly right for
+bring-your-own data. But for **standard Microsoft identities and endpoints**, I
+would *not* hand-roll a graph at all: I would rely natively on the **Microsoft
+Defender XDR Identity Graph and Advanced Hunting** (the `IdentityInfo`,
+`IdentityDirectoryEvents` and behaviour-analytics tables, and the built-in entity
+graph in the unified portal), which already correlate identity-to-device-to-cloud
+relationships out of the box. The engineering judgement is to use `make-graph`
+only for the custom edges the platform cannot see, and lean on the Defender XDR
+unified graph for everything it already models - minimising custom query
+overhead and the surface I have to maintain.
+
 **From generic agents to Declarative Agents.** A hand-rolled agent wrapping a
 bespoke MCP server means I own the whole surface - retrieval, grounding, auth,
 and the reasoning loop. The Declarative Agent format lets me declare the

@@ -447,6 +447,14 @@ carries, not how much.
   [`make-graph` / `graph-match`](v3-enterprise-native/graph/attack-path-make-graph.kql),
   which expresses the same identity-to-infrastructure path inside Log Analytics -
   no external compute, no glue code, composable with every analytics rule.
+- **Sentinel Graph vs the Defender XDR unified graph.** With Microsoft Sentinel
+  and Microsoft Defender XDR now merged into the Unified Security Operations
+  Platform, `make-graph` is the right tool for my **custom lab telemetry** (the
+  synthetic CyberArk safe, the NSG/asset watchlist). For **standard Microsoft
+  identities**, I would instead rely natively on the **Microsoft Defender XDR
+  Identity Graph and Advanced Hunting** (`IdentityInfo`, `IdentityDirectoryEvents`,
+  the built-in entity graph) rather than hand-roll a query - reserving custom
+  `make-graph` for the edges the platform cannot already see.
 - **From generic agents to Declarative Agents.** A
   [Declarative Agent manifest](v3-enterprise-native/declarative-agent/manifest.json)
   declares the **native Microsoft Sentinel MCP server** for graph queries and

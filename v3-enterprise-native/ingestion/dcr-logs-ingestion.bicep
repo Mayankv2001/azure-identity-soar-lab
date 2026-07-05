@@ -26,8 +26,16 @@ param dceName string = 'dce-identity-soar-lab'
 @description('Data Collection Rule name.')
 param dcrName string = 'dcr-cyberark-epv-lab'
 
-@description('Custom table name (must end with _CL).')
+@description('DCR-based custom table name. ARM requires it to end with _CL.')
 param customTableName string = 'CyberArk_EPV_CL'
+
+// ARM is strict about DCR custom-log naming:
+//  - the custom table MUST end with _CL (e.g. CyberArk_EPV_CL);
+//  - the input stream declaration MUST start with the Custom- prefix and, by
+//    convention, matches the table (Custom-CyberArk_EPV_CL). A missing Custom-
+//    prefix fails deployment. Driving all three names (stream declaration,
+//    dataFlow stream, outputStream) from one variable keeps them from drifting.
+var streamName = 'Custom-${customTableName}'   // -> Custom-CyberArk_EPV_CL
 
 resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workspaceName
@@ -76,7 +84,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2023-03-11' = {
   properties: {
     dataCollectionEndpointId: dce.id
     streamDeclarations: {
-      'Custom-CyberArkEPV': {
+      '${streamName}': {
         columns: [
           { name: 'TimeGenerated', type: 'datetime' }
           { name: 'EventType', type: 'string' }
@@ -101,14 +109,15 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2023-03-11' = {
     dataFlows: [
       {
         streams: [
-          'Custom-CyberArkEPV'
+          streamName
         ]
         destinations: [
           'laDestination'
         ]
         // Pass-through transform; refine per tenant (drop/rename/enrich here).
         transformKql: 'source'
-        outputStream: 'Custom-${customTableName}'
+        // outputStream routes to the DCR-based custom table (Custom-<Table>_CL).
+        outputStream: streamName
       }
     ]
   }
@@ -121,5 +130,5 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2023-03-11' = {
 // tokens with the Monitoring Metrics Publisher role on the DCR).
 output dceLogsIngestionEndpoint string = dce.properties.logsIngestion.endpoint
 output dcrImmutableId string = dcr.properties.immutableId
-output inputStreamName string = 'Custom-CyberArkEPV'
+output inputStreamName string = streamName   // Custom-CyberArk_EPV_CL
 output customTable string = customTableName
