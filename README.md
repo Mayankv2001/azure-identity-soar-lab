@@ -423,6 +423,18 @@ tuning exists yet. See
 [production-readiness/README.md](production-readiness/README.md) and the
 [production readiness scorecard](production-readiness/reports/PRODUCTION_READINESS_SCORECARD.md).
 
+## Version 2.0: Agentic AI SOAR & graph correlation
+
+[v2-agentic-soar/](v2-agentic-soar/) aligns the lab with 2026 patterns: a
+Microsoft Security Copilot custom agent with an MCP grounding server (replacing
+static playbooks - AI proposes, humans approve), a workload-identity
+**credential-bridging** detection for compromised GitHub Actions pipelines, a
+runnable **graph-powered correlation** engine
+([src/graph_correlation.py](src/graph_correlation.py)) that recovers an
+identity-to-infrastructure attack path a time-window join misses, and a
+shift-left **GitHub Actions (OIDC, no secrets) + Bicep** detection-as-code
+pipeline. Details: [v2-agentic-soar/README.md](v2-agentic-soar/README.md).
+
 ## License
 
 MIT - see [LICENSE](LICENSE).

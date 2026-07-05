@@ -1,0 +1,140 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/2025-06-18/server.json",
+  "_comment": "Conceptual Model Context Protocol (MCP) server schema for the Identity SOAR agent used by a Microsoft Security Copilot custom agent. Read tools are auto-executable; the single state-changing tool ONLY proposes an approval-gated plan and never mutates state. No secrets or tokens appear here; the server authenticates to Azure via managed identity / OIDC at runtime.",
+  "server": {
+    "name": "identity-soar-mcp",
+    "version": "2.0.0",
+    "description": "Grounds a Security Copilot agent in Microsoft Sentinel, Microsoft Entra ID Protection, and this repo's detection context for identity-attack triage. Read-only by default; containment is proposal-only and human-approved.",
+    "capabilities": {
+      "tools": true,
+      "resources": true,
+      "prompts": true,
+      "logging": true
+    },
+    "auth": {
+      "mode": "workload_identity_federation",
+      "note": "Server runs as an Azure managed identity / federated workload identity. No client secrets are stored. Least-privilege RBAC: Microsoft Sentinel Reader + Security Reader for read tools; the propose tool holds NO write role."
+    }
+  },
+  "tools": [
+    {
+      "name": "get_signin_timeline",
+      "description": "Return the sign-in timeline for an identity over a window, including MFA results, result types, risk level, IP and geo. Read-only.",
+      "annotations": {"readOnlyHint": true, "destructiveHint": false},
+      "inputSchema": {
+        "type": "object",
+        "required": ["userPrincipalName", "lookbackHours"],
+        "properties": {
+          "userPrincipalName": {"type": "string", "format": "email"},
+          "lookbackHours": {"type": "integer", "minimum": 1, "maximum": 168}
+        }
+      }
+    },
+    {
+      "name": "get_unified_identity_risk_score",
+      "description": "Return the unified identity risk score and contributing risk detections for a user from Microsoft Entra ID Protection (riskLevel, riskState, riskDetections) fused with Sentinel UEBA (InvestigationPriority). Read-only.",
+      "annotations": {"readOnlyHint": true, "destructiveHint": false},
+      "inputSchema": {
+        "type": "object",
+        "required": ["userPrincipalName"],
+        "properties": {
+          "userPrincipalName": {"type": "string", "format": "email"}
+        }
+      }
+    },
+    {
+      "name": "get_correlated_incident_graph",
+      "description": "Return the graph-correlated blast radius for an alert: connected entities and the attack path (identity -> service principal -> resource -> exposure) via graph relationships, not time-window joins. Read-only.",
+      "annotations": {"readOnlyHint": true, "destructiveHint": false},
+      "inputSchema": {
+        "type": "object",
+        "required": ["seedEntity"],
+        "properties": {
+          "seedEntity": {"type": "string", "description": "UPN, service principal id, or resource id"},
+          "maxHops": {"type": "integer", "minimum": 1, "maximum": 8, "default": 6}
+        }
+      }
+    },
+    {
+      "name": "check_mfa_fatigue_pattern",
+      "description": "Evaluate whether a user's recent sign-ins match the MFA fatigue signature (>=5 denied/timed-out strong-auth prompts in 10 minutes, optionally followed by an approval). Read-only.",
+      "annotations": {"readOnlyHint": true, "destructiveHint": false},
+      "inputSchema": {
+        "type": "object",
+        "required": ["userPrincipalName"],
+        "properties": {
+          "userPrincipalName": {"type": "string", "format": "email"}
+        }
+      }
+    },
+    {
+      "name": "propose_containment_action",
+      "description": "PROPOSE (do not execute) a containment plan for an incident. Returns an ordered, least-destructive-first plan with each action's automation class (automatic / approval-required) and a rollback note. This tool NEVER mutates state; execution requires a human approval that runs a separate, audited Logic App playbook.",
+      "annotations": {"readOnlyHint": true, "destructiveHint": false, "proposalOnly": true},
+      "inputSchema": {
+        "type": "object",
+        "required": ["incidentId", "seedEntity"],
+        "properties": {
+          "incidentId": {"type": "string"},
+          "seedEntity": {"type": "string"},
+          "confirmedCompromise": {"type": "boolean", "default": false}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "proposedPlan": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "order": {"type": "integer"},
+                "action": {"type": "string"},
+                "automationClass": {"type": "string", "enum": ["automatic", "approval-required"]},
+                "approverRole": {"type": "string"},
+                "rollback": {"type": "string"}
+              }
+            }
+          },
+          "requiresHumanApproval": {"type": "boolean", "const": true}
+        }
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "soar://detections/catalogue",
+      "name": "Detection catalogue",
+      "description": "The repo's detection catalogue (DET-001..007, CP-DET-001..008, DET-CICD-001) with MITRE mappings, thresholds and tuning notes - grounds the agent so it reasons about real rules.",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "soar://playbooks/automation-matrix",
+      "name": "SOAR automation matrix",
+      "description": "Which response actions are automatic vs approval-required, keyed by blast radius / reversibility / confidence.",
+      "mimeType": "application/json"
+    },
+    {
+      "uri": "soar://responsible-ai/boundaries",
+      "name": "Responsible AI boundaries",
+      "description": "The agent's operating constraints: advisory-only, human-in-the-loop for state changes, minimised context, untrusted-telemetry handling.",
+      "mimeType": "text/markdown"
+    }
+  ],
+  "prompts": [
+    {
+      "name": "triage_mfa_fatigue",
+      "description": "The MFA-fatigue triage promptbook (see mfa-fatigue-triage.promptbook.md).",
+      "arguments": [
+        {"name": "incidentId", "required": true},
+        {"name": "userPrincipalName", "required": true}
+      ]
+    }
+  ],
+  "guardrails": {
+    "human_in_the_loop": "No tool executes a state-changing action. propose_containment_action returns a plan; a human approves and a separate audited playbook acts.",
+    "data_minimisation": "Tools return aggregates and typed entities, not raw log bodies; no secrets or tokens are ever returned.",
+    "untrusted_input": "Telemetry-derived strings are treated as data, never instructions (prompt-injection defence).",
+    "auditability": "Every tool call and every proposed plan is logged for review."
+  }
+}
