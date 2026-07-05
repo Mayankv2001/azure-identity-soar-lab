@@ -50,12 +50,12 @@ Detections are written as KQL and version-controlled YAML, mirrored as a tested 
 
 | ID | Scenario | Data Source | MITRE Technique | Severity | Response Action |
 |---|---|---|---|---|---|
-| **DET-001** | MFA fatigue / push bombing | SigninLogs | T1621 | High $\rightarrow$ Critical | Revoke sessions, reset credentials via PB-04/05 |
+| **DET-001** | MFA fatigue / push bombing | SigninLogs | T1621 | High → Critical | Revoke sessions, reset credentials via PB-04/05 |
 | **DET-002** | Impossible travel | SigninLogs | T1078.004 | Medium | Attribute second IP; isolate if unexplained |
-| **DET-003** | Conditional Access modified | AuditLogs | T1556.009 | High $\rightarrow$ Critical | Revert policy via PB-06; triage actor |
-| **DET-004** | Service Principal cred added | AuditLogs | T1098.001 | High $\rightarrow$ Critical | Remove new credential; audit SP sign-ins |
-| **DET-005** | Privileged role/group addition | AuditLogs | T1098.003 | High $\rightarrow$ Critical | Remove membership; suspend actor via PB-06 |
-| **DET-006** | CyberArk checkout anomaly | CyberArk_EPV_CL | T1078.002 | Medium $\rightarrow$ Critical | Force check-in, rotate credentials, review PSM |
+| **DET-003** | Conditional Access modified | AuditLogs | T1556.009 | High → Critical | Revert policy via PB-06; triage actor |
+| **DET-004** | Service Principal cred added | AuditLogs | T1098.001 | High → Critical | Remove new credential; audit SP sign-ins |
+| **DET-005** | Privileged role/group addition | AuditLogs | T1098.003 | High → Critical | Remove membership; suspend actor via PB-06 |
+| **DET-006** | CyberArk checkout anomaly | CyberArk_EPV_CL | T1078.002 | Medium → Critical | Force check-in, rotate credentials, review PSM |
 | **DET-007** | Stale privileged account | Identity Watchlist | T1078 | Low/Medium | Posture finding: disable or convert to PIM |
 
 ---
@@ -77,7 +77,7 @@ If you prefer to review outputs directly without executing code, the following d
 
 Located under `modules/datacenter-control-plane/`, this secondary module follows the attacker past the identity plane and directly into Azure infrastructure—the exact seam where cloud security engineering operates.
 
-* **What it demonstrates:** One correlated attack chain tracking a risky sign-in $\rightarrow$ MFA fatigue $\rightarrow$ ticketless privileged-role activation $\rightarrow$ credential added to a high-privilege service principal $\rightarrow$ Owner role granted on a core resource group $\rightarrow$ an NSG rule opening RDP to `0.0.0.0/0` on a management jumpbox.
+* **What it demonstrates:** One correlated attack chain tracking a risky sign-in → MFA fatigue → ticketless privileged-role activation → credential added to a high-privilege service principal → Owner role granted on a core resource group → an NSG rule opening RDP to `0.0.0.0/0` on a management jumpbox.
 * **Why it matters:** Cloud security engineering is more than alert watching. This module models cross-plane entity correlation into a single Critical incident with an explainable blast-radius score (100/100) and provides a blameless post-mortem recommending the specific Azure Policy that blocks the root configuration flaw.
 
 ---
@@ -101,7 +101,7 @@ azure-identity-soar-lab/
 │   └── validate-detections.yml        CI/CD: validate -> test -> package -> gated deploy
 ├── data/                              Committed synthetic telemetry (seed 42, 7 days)
 ├── demo-output/                       Committed sample run artifacts (timelines, metrics)
-├── detections/                        15 x Production-ready KQL & YAML analytics rules
+├── detections/                        15 x KQL & YAML analytics rules across modules
 ├── playbooks/                         Logic App pseudocode and automate-vs-approve matrices
 ├── src/                               Core simulation, incident building, and metrics engines
 ├── modules/datacenter-control-plane/  Identity-to-infrastructure attack path module
