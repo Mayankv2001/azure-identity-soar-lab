@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.3/schema.json",
+  "schema_version": "v2.3",
+  "name_for_human": "Identity SOAR Containment (proposal-only)",
+  "description_for_human": "Proposes an ordered, human-approved containment plan for an identity incident. Never executes.",
+  "description_for_model": "Use ONLY to generate a proposed containment plan for a confirmed or suspected identity compromise. The single function proposeContainmentAction returns an ordered, least-destructive-first plan with each action's automation class and required approver. It performs NO state change. After presenting the plan you must stop; a human DRI approves and a separate audited playbook executes.",
+  "namespace": "identitySoar",
+  "capabilities": {
+    "conversation_starters": [
+      { "text": "Propose containment for this incident" }
+    ]
+  },
+  "functions": [
+    {
+      "name": "proposeContainmentAction",
+      "description": "Return a proposed, approval-gated containment plan for an incident. Proposal only; requiresHumanApproval is always true.",
+      "parameters": {
+        "type": "object",
+        "required": ["incidentId", "seedEntity"],
+        "properties": {
+          "incidentId": { "type": "string", "description": "Sentinel incident id" },
+          "seedEntity": { "type": "string", "description": "UPN, service principal id, or resource id" },
+          "confirmedCompromise": { "type": "boolean", "default": false }
+        }
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "proposedPlan": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "order": { "type": "integer" },
+                "action": { "type": "string" },
+                "automationClass": { "type": "string", "enum": ["automatic", "approval-required"] },
+                "approverRole": { "type": "string" },
+                "rollback": { "type": "string" }
+              }
+            }
+          },
+          "requiresHumanApproval": { "type": "boolean", "const": true }
+        }
+      },
+      "states": {
+        "reasoning": { "description": "Generating a proposed containment plan; no action is taken." },
+        "responding": { "description": "Presenting the plan; execution requires human approval." }
+      }
+    }
+  ],
+  "runtimes": [
+    {
+      "type": "MCP",
+      "auth": {
+        "type": "OAuthPluginVault",
+        "reference_id": "identity-soar-mcp-federated"
+      },
+      "spec": {
+        "url": "https://mcp.contoso-soc.example.com/identity-soar",
+        "transport": "streamable-http"
+      },
+      "run_for_functions": ["proposeContainmentAction"]
+    }
+  ]
+}

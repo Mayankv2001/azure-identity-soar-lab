@@ -435,6 +435,33 @@ identity-to-infrastructure attack path a time-window join misses, and a
 shift-left **GitHub Actions (OIDC, no secrets) + Bicep** detection-as-code
 pipeline. Details: [v2-agentic-soar/README.md](v2-agentic-soar/README.md).
 
+## Aligning with Microsoft's 2026 roadmap
+
+[v3-enterprise-native/](v3-enterprise-native/) is the enterprise-polish layer -
+it retires V2's custom implementations for first-party Microsoft capabilities,
+because the mark of a mature platform build is how *little* custom code it
+carries, not how much.
+
+- **From Python to Sentinel Graph.** The V2 custom Python attack-graph engine is
+  deprecated in favour of native KQL
+  [`make-graph` / `graph-match`](v3-enterprise-native/graph/attack-path-make-graph.kql),
+  which expresses the same identity-to-infrastructure path inside Log Analytics -
+  no external compute, no glue code, composable with every analytics rule.
+- **From generic agents to Declarative Agents.** A
+  [Declarative Agent manifest](v3-enterprise-native/declarative-agent/manifest.json)
+  declares the **native Microsoft Sentinel MCP server** for graph queries and
+  identity risk, and reduces the custom footprint to a single proposal-only
+  containment plugin - the responsible-AI boundary enforced by tool scoping, not
+  just prose.
+- **From legacy APIs to DCRs / CCF.** Telemetry moves off the retiring Data
+  Collector API onto a
+  [DCE + DCR + Logs Ingestion API](v3-enterprise-native/ingestion/dcr-logs-ingestion.bicep)
+  pipeline - keyless Entra ID auth, ingestion-time transforms, the same
+  declarative pattern as the Codeless Connector Framework.
+
+The theme: delete the custom thing when the platform grows a native one. Full
+write-up: [v3-enterprise-native/README.md](v3-enterprise-native/README.md).
+
 ## License
 
 MIT - see [LICENSE](LICENSE).

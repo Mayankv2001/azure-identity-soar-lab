@@ -1,0 +1,96 @@
+// V3.0 | Native Sentinel graph semantics - identity-to-infrastructure attack path
+// Supersedes: src/graph_correlation.py (custom Python AttackGraph - now deprecated)
+//
+// Uses KQL's native graph operators (make-graph + graph-match) to detect the
+// exact path the Python engine found, but inside Log Analytics/Sentinel with no
+// external compute:
+//
+//     (User) -[added_credential_to]-> (ServicePrincipal)
+//            -[modified]-> (NSG) -[exposed_to_internet]-> (VM)
+//
+// The point (same as the Python demo): the NSG change is performed by the
+// SERVICE PRINCIPAL, not the user, so a caller-keyed time-window join misses it.
+// graph-match traverses the added_credential_to bridge edge and recovers the
+// full path natively.
+//
+// Tables: AuditLogs, AzureActivity, plus _GetWatchlist('AssetInventory')
+// (NSG -> protected VM, and which VMs have a public IP). Ships as a hunting/
+// analytics query; validate table/column availability per tenant before enabling.
+
+let lookback = 1d;
+let publicPrefixes = dynamic(["0.0.0.0/0", "*", "Internet"]);
+let managementPorts = dynamic(["22", "3389", "5985", "5986"]);
+// Asset context: which VM each NSG protects, and whether that VM is internet-reachable.
+let assets =
+    _GetWatchlist('AssetInventory')
+    | where tostring(Type) == "network_security_group"
+    | project Nsg = tostring(Name), ProtectedVm = tostring(ProtectedVm), VmHasPublicIp = tobool(VmHasPublicIp);
+// 1) Normalise heterogeneous telemetry into ONE typed edge list.
+let edges =
+    union
+        // Edge A: identity adds a credential to a service principal (persistence bridge).
+        (
+            AuditLogs
+            | where TimeGenerated > ago(lookback)
+            | where OperationName == "Add service principal credentials"
+            | extend SourceNode = tostring(InitiatedBy.user.userPrincipalName),
+                     TargetNode = tostring(TargetResources[0].displayName),
+                     EdgeType = "added_credential_to"
+            | project SourceNode, TargetNode, EdgeType, TimeGenerated
+        ),
+        // Edge B: a principal (usually the SP) modifies an NSG to allow inbound from the internet.
+        (
+            AzureActivity
+            | where TimeGenerated > ago(lookback)
+            | where OperationNameValue == "Microsoft.Network/networkSecurityGroups/securityRules/write"
+            | where ActivityStatusValue == "Success"
+            | extend props = parse_json(tostring(Properties))
+            | where tostring(props.access) == "Allow"
+                and tostring(props.sourceAddressPrefix) in (publicPrefixes)
+            | extend SourceNode = Caller,
+                     TargetNode = tostring(props.nsgName),
+                     EdgeType = "modified"
+            | project SourceNode, TargetNode, EdgeType, TimeGenerated
+        ),
+        // Edge C: the modified NSG exposes the VM it protects (derived exposure edge).
+        (
+            AzureActivity
+            | where TimeGenerated > ago(lookback)
+            | where OperationNameValue == "Microsoft.Network/networkSecurityGroups/securityRules/write"
+            | extend props = parse_json(tostring(Properties))
+            | where tostring(props.access) == "Allow"
+                and tostring(props.sourceAddressPrefix) in (publicPrefixes)
+                and tostring(props.destinationPortRange) in (managementPorts)
+            | extend Nsg = tostring(props.nsgName)
+            | join kind=inner assets on Nsg
+            | where VmHasPublicIp == true
+            | extend SourceNode = Nsg, TargetNode = ProtectedVm, EdgeType = "exposed_to_internet"
+            | project SourceNode, TargetNode, EdgeType, TimeGenerated
+        )
+    | where isnotempty(SourceNode) and isnotempty(TargetNode);
+// 2) Optional explicit node table (adds NodeType for richer matching).
+let nodes =
+    edges
+    | project NodeId = SourceNode
+    | union (edges | project NodeId = TargetNode)
+    | distinct NodeId;
+// 3) Build the graph and match the 3-hop attack path.
+edges
+| make-graph SourceNode --> TargetNode with nodes on NodeId
+| graph-match (user)-[cred]->(sp)-[mod]->(nsg)-[expose]->(vm)
+    where cred.EdgeType == "added_credential_to"
+        and mod.EdgeType == "modified"
+        and expose.EdgeType == "exposed_to_internet"
+        // temporal sanity: the chain must move forward in time
+        and cred.TimeGenerated <= mod.TimeGenerated
+        and mod.TimeGenerated <= expose.TimeGenerated
+    project
+        CompromisedUser = user.NodeId,
+        ServicePrincipal = sp.NodeId,
+        NetworkSecurityGroup = nsg.NodeId,
+        ExposedVM = vm.NodeId,
+        AttackPath = strcat(user.NodeId, " -> ", sp.NodeId, " -> ", nsg.NodeId, " -> ", vm.NodeId),
+        FirstSeen = cred.TimeGenerated,
+        ExposureTime = expose.TimeGenerated
+| extend Severity = "Critical", Technique = "T1098.001 -> T1562.007 -> T1133"
+| sort by FirstSeen asc

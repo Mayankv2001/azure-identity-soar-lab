@@ -1,5 +1,12 @@
 """Graph-powered correlation engine (V2.0).
 
+DEPRECATED (V3.0): superseded by native KQL graph semantics in
+v3-enterprise-native/graph/attack-path-make-graph.kql, which expresses the same
+identity-to-infrastructure path using make-graph / graph-match inside Log
+Analytics (no external compute). This module is retained as a readable reference
+implementation and remains runnable/tested; new work should target the native
+KQL. See v3-enterprise-native/README.md ("From Python to Sentinel Graph").
+
 Simulates Microsoft Sentinel's modern graph-based context. Where the classic
 incident_builder.py correlates alerts by shared user within a time window, this
 builds a typed property graph of entities (identities, service principals,
